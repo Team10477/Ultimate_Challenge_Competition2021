@@ -15,8 +15,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-@Autonomous(name="Encoder-Red Right Target Zones")
-public class RightRedTargetZones_Encoder extends LinearOpMode {
+@Autonomous(name="Encoder-Red Left Target Zones")
+public class LeftRedTargetZones_Encoder extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
     private static final String LABEL_QUAD_ELEMENT ="Quad";
     private static final String LABEL_SINGLE_ELEMENT = "Single";
@@ -49,7 +49,13 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
     double deltaTurn = 0;
     double GAIN_PROP = 0.015;
     double GAIN_INT = 0.015;
-    double LIGHT_INTENSITY_WHITE = 30;
+    double LIGHT_INTENSITY_WHITE = 300;
+    static int DRIVE_FORWARD = 1;
+    static int DRIVE_BACK = 0;
+    static int STRAFE_RIGHT = 2;
+    static int STRAFE_LEFT = 3;
+    static int WOBBLE_ARM_DOWN = 4;
+    static int WOBBLE_ARM_UP = 5;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -65,9 +71,6 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
     }
 
     public void initHardwareMap() {
-        initVuforia();
-        initTfod();
-        activateTfod();
         hardwarePushBot.initializeImu(hardwareMap);
         hardwarePushBot.mapWheels(hardwareMap);
         hardwarePushBot.mapColorSensor(hardwareMap);
@@ -84,6 +87,14 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
         hardwarePushBot.leftBackWheel.setDirection(DcMotor.Direction.REVERSE);
         hardwarePushBot.rightFrontWheel.setDirection(DcMotor.Direction.REVERSE);
         hardwarePushBot.rightBackWheel.setDirection(DcMotor.Direction.FORWARD);
+        hardwarePushBot.wobbleGoalFinger.setPosition(1);
+        hardwarePushBot.shootingTrigger.setPosition(0);
+        initVuforia();
+        initTfod();
+        activateTfod();
+
+        telemetry.addData("Initialization complete", "Done");
+        telemetry.update();
 
     }
 
@@ -92,18 +103,56 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
         hardwarePushBot.leftBackWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         hardwarePushBot.rightFrontWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         hardwarePushBot.rightBackWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
     }
 
-    public void setTargetPosition(int position) {
-        hardwarePushBot.leftFrontWheel.setTargetPosition(position);
-        hardwarePushBot.leftBackWheel.setTargetPosition(position);
-        hardwarePushBot.rightFrontWheel.setTargetPosition(position);
-        hardwarePushBot.rightBackWheel.setTargetPosition(position);
+    public void runWithoutEncoder() {
+        hardwarePushBot.leftFrontWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        hardwarePushBot.leftBackWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        hardwarePushBot.rightFrontWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        hardwarePushBot.rightBackWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
 
-    public void runToPosition() {
+    public void setTargetPositionOld(int position) {
+        hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() + position);
+        hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() + position);
+        hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() + position);
+        hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() + position);
+
+    }
+
+    public void setTargetPosition(int action, int position) {
+        if (action == 0) { // Drive backward
+            hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() + position);
+            hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() + position);
+            hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() + position);
+            hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() + position);
+        } else if (action == 1) { // Drive forward
+            hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() - position);
+            hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() - position);
+            hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() - position);
+            hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() - position);
+        } else if (action == 2) { // Strafe right
+            hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() - position);
+            hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() + position);
+            hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() + position);
+            hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() - position);
+        }  else if (action == 3) { // Strafe left
+            hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() + position);
+            hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() - position);
+            hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() - position);
+            hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() + position);
+        }  else if (action == 4) { // Wobble arm down
+            hardwarePushBot.wobbleGoalArm.setTargetPosition(hardwarePushBot.wobbleGoalArm.getCurrentPosition()+position);
+        } else if (action == 5) { // Wobble arm up
+            hardwarePushBot.wobbleGoalArm.setTargetPosition(hardwarePushBot.wobbleGoalArm.getCurrentPosition()-position);
+        }
+
+    }
+
+    public void runToPositionMode() {
         hardwarePushBot.leftFrontWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         hardwarePushBot.leftBackWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         hardwarePushBot.rightFrontWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -111,42 +160,191 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
 
     }
 
+    public void runToPosition(double power) {
+        runToPositionMode();
+
+        hardwarePushBot.setWheelPower(power, power, power, power);
+
+        while (opModeIsActive() && hardwarePushBot.leftFrontWheel.isBusy() ||
+                hardwarePushBot.rightFrontWheel.isBusy() && hardwarePushBot.leftBackWheel.isBusy() &&
+                hardwarePushBot.rightBackWheel.isBusy()) {
+            telemetry.addData("Current position right front", hardwarePushBot.rightFrontWheel.getCurrentPosition());
+            telemetry.update();
+        }
+
+        hardwarePushBot.setWheelPower(0.0, 0.0, 0.0, 0.0);
+
+    }
+
+    public void runToPositionForWobbleArm(double power) {
+        hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        hardwarePushBot.wobbleGoalArm.setPower(power);
+
+        while (opModeIsActive() && hardwarePushBot.wobbleGoalArm.isBusy() ) {
+            telemetry.addData("Current position wobble arm", hardwarePushBot.wobbleGoalArm.getCurrentPosition());
+            telemetry.update();
+        }
+
+        hardwarePushBot.wobbleGoalArm.setPower(0);
+
+    }
+
     public void goToTargetZones() {
         switch (targetZone) {
             case 1:
-                //Go to the right
-                drivewWithFeedback_FBM(0, 0.4, 1.5);
+                //1. Strafe left
 
-                //Go to Red
-                drivewWithFeedback_FBM_Colors(-0.5, 0.0, 4.0, "RED");
+                stopResetEncoder();
 
-                //Go to White
-                drivewWithFeedback_FBM_Colors(-0.3, 0.0, 2.0, "WHITE");
+                setTargetPosition(STRAFE_LEFT,1000);
+
+                runToPosition(1);
+
+                //2. Go forward.
+
+                setTargetPosition(DRIVE_FORWARD,3550);
+
+                runToPosition(1);
+
+                //3. Strafe Right.
+
+                setTargetPosition(STRAFE_RIGHT,2700);
+
+                runToPosition(1);
+
+                //3. Wobble Goal arm.
+
+               setTargetPosition(WOBBLE_ARM_DOWN, 3100);
+
+               runToPositionForWobbleArm(0.75);
+
+               hardwarePushBot.wobbleGoalFinger.setPosition(0);
+
+               //4. Wobble Goal Arm up
+                setTargetPosition(WOBBLE_ARM_UP, 3100);
+
+                runToPositionForWobbleArm(0.75);
+
+                //5. Turn on shooting wheel.
+                hardwarePushBot.shootingWheel.setPower(1);
+
+                runWithoutEncoder();
+
+                //6. Go back 0.5 using feedback
+                drivewWithFeedback_FBM_Colors(0.5, 0, 1.0, "RED");
+
+                //7. Strafe left using feedback
+                drivewWithFeedback_FBM(0, -0.5, 1.0);
+
+                drivewWithFeedback_FBM(-0.5, 0, 0.25);
+
+                //8.Shooting Rings
+                for (int i=0; i < 3; i++) {
+                    hardwarePushBot.shootingTrigger.setPosition(1);
+                    sleep(500);
+                    hardwarePushBot.shootingTrigger.setPosition(0);
+                    sleep(500);
+                }
+
+                //9. Move forward to park.
+                //6. Go back 0.5 using feedback
+                drivewWithFeedback_FBM(-0.5, 0, 0.25);
                 break;
             case 2 :
-                //Go to the right
-                drivewWithFeedback_FBM(0, 0.4, 1.5);
 
-                //Go to Red
-                drivewWithFeedback_FBM_Colors(-0.5, 0.0, 4.0, "RED");
+                //1. Go to the right
 
-                //Go to Red
-                drivewWithFeedback_FBM_Colors(-0.5, 0.0, 4.0, "RED");
+                stopResetEncoder();
 
-                //Move Forward
-                drivewWithFeedback_FBM(-0.5, 0, 0.5);
+                setTargetPosition(STRAFE_LEFT,1000);
 
-                //Go to Red
-                drivewWithFeedback_FBM_Colors(0, -0.5, 4.0, "RED");
+                runToPosition(1);
+
+                //2. Go forward.
+
+                setTargetPosition(DRIVE_FORWARD,4800);
+
+                runToPosition(1);
+
+                //3. Strafe right
+
+                setTargetPosition(STRAFE_LEFT,1000);
+
+                runToPosition(1);
+
+                //4. Wobble Goal arm.
+
+                setTargetPosition(WOBBLE_ARM_DOWN, 3100);
+
+                runToPositionForWobbleArm(0.75);
+
+                hardwarePushBot.wobbleGoalFinger.setPosition(0);
+
                 break;
             case 3:
-                //Go to the right
-                drivewWithFeedback_FBM(0, 0.4, 1.5);
 
-                //Detect Red 3 times
-                drivewWithFeedback_FBM_Colors(-0.5, 0.0, 6.0, "RED");
-                drivewWithFeedback_FBM_Colors(-0.5, 0.0, 2.0, "RED");
-                drivewWithFeedback_FBM_Colors(-0.5, 0.0, 5.0, "RED");
+                //1. Go to the right
+
+                stopResetEncoder();
+
+                setTargetPosition(STRAFE_LEFT,1000);
+
+                runToPosition(1);
+
+                //2. Go forward.
+
+                setTargetPosition(DRIVE_FORWARD,6300);
+
+                runToPosition(1);
+
+                //3. Strafe Right
+
+                setTargetPosition(STRAFE_RIGHT,2700);
+
+                runToPosition(1);
+
+                //4. Wobble Goal arm.
+
+                setTargetPosition(WOBBLE_ARM_DOWN, 3100);
+
+                runToPositionForWobbleArm(0.75);
+
+                hardwarePushBot.wobbleGoalFinger.setPosition(0);
+
+                //4. Wobble Goal Arm up
+                setTargetPosition(WOBBLE_ARM_UP, 3100);
+
+                runToPositionForWobbleArm(0.75);
+
+                setTargetPosition(DRIVE_BACK,2800);
+
+                runToPosition(1);
+
+                //5. Turn on shooting wheel.
+                hardwarePushBot.shootingWheel.setPower(1);
+
+                runWithoutEncoder();
+
+                //6. Go back 0.5 using feedback
+                drivewWithFeedback_FBM_Colors(0.5, 0, 1.0, "RED");
+
+                //7. Strafe left using feedback
+                drivewWithFeedback_FBM(0, -0.5, 1.0);
+
+                drivewWithFeedback_FBM(-0.5, 0, 0.25);
+
+                //8.Shooting Rings
+                for (int i=0; i < 3; i++) {
+                    hardwarePushBot.shootingTrigger.setPosition(1);
+                    sleep(500);
+                    hardwarePushBot.shootingTrigger.setPosition(0);
+                    sleep(500);
+                }
+
+                //9. Move forward to park.
+                //6. Go back 0.5 using feedback
+                drivewWithFeedback_FBM(-0.5, 0, 0.25);
                 break;
         }
     }
@@ -270,6 +468,26 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
         hardwarePushBot.mecanumDrive(0,0.0,0.0);
     }
 
+    /**
+     * Drive/Strafe with feedback.
+     * @param drive_power
+     * @param strafe_power
+     */
+    public void drivewWithFeedback_FBMEncoder(double drive_power, double strafe_power){
+        hardwarePushBot.mecanumDrive(drive_power,strafe_power,0.0); // pass the parameters to a mecanumDrive method
+
+        elapsedTime.reset();
+        integralError=0;
+        while (opModeIsActive()){
+            heading = hardwarePushBot.getAngle();
+            error =heading - 0; // desrired - current heading is the error
+            integralError = integralError + error*0.025;
+
+            hardwarePushBot.mecanumDrive(drive_power,strafe_power,-(error*GAIN_PROP+integralError*GAIN_INT)); // the multiplication of 0.015 is a gain to make the turn power small (not close to 1, which is maximum)
+        }
+        hardwarePushBot.mecanumDrive(0,0.0,0.0);
+    }
+
 
     /**
      * Drive/Strafe with feedback loop and color detection.
@@ -316,9 +534,9 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
     public boolean isRedColorFound() {
         boolean found = false;
 
-        Color.RGBToHSV((int) (hardwarePushBot.rightColorSensor.red() * SCALE_FACTOR),
-                (int) (hardwarePushBot.rightColorSensor.green() * SCALE_FACTOR),
-                (int) (hardwarePushBot.rightColorSensor.blue() * SCALE_FACTOR),
+        Color.RGBToHSV((int) (hardwarePushBot.frontColorSensor.red() * SCALE_FACTOR),
+                (int) (hardwarePushBot.frontColorSensor.green() * SCALE_FACTOR),
+                (int) (hardwarePushBot.frontColorSensor.blue() * SCALE_FACTOR),
                 hsvValues);
         // CheckForRed is a hsv value check
 
@@ -347,9 +565,9 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
         //     lightIntensity = hardwarePushBot.rightColorSensor.alpha(); // total light luminosity
 
 
-        Color.RGBToHSV((int) (hardwarePushBot.rightColorSensor.red() * SCALE_FACTOR),
-                (int) (hardwarePushBot.rightColorSensor.green() * SCALE_FACTOR),
-                (int) (hardwarePushBot.rightColorSensor.blue() * SCALE_FACTOR),
+        Color.RGBToHSV((int) (hardwarePushBot.frontColorSensor.red() * SCALE_FACTOR),
+                (int) (hardwarePushBot.frontColorSensor.green() * SCALE_FACTOR),
+                (int) (hardwarePushBot.frontColorSensor.blue() * SCALE_FACTOR),
                 hsvValues);
         // CheckForRed is a hsv value check
 
