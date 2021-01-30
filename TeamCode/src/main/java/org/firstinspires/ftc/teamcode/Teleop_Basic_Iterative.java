@@ -29,13 +29,24 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.app.Activity;
 import android.graphics.Color;
+import android.view.View;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+import java.util.Locale;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -92,7 +103,10 @@ public class Teleop_Basic_Iterative extends OpMode
 
         initHardwareMap();
 
-        hardwarePushBot.wobbleGoalFinger.setPosition(1.0); // closed finger
+
+
+
+        hardwarePushBot.wobbleGoalFinger.setPosition(0.0); // closed finger
        // hardwarePushBot.wobbleGoalArm.setDirection(DcMotor.Direction.REVERSE);
         //hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
        // hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -126,6 +140,8 @@ public class Teleop_Basic_Iterative extends OpMode
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
     @Override
+
+
     public void loop() {
         // Setup a variable for each drive wheel to save power level for telemetry
         double leftFrontPower;
@@ -138,6 +154,7 @@ public class Teleop_Basic_Iterative extends OpMode
         double wobbleHandPower;
         double hue, saturation, value;
         double lightIntensity;
+        double wobbleGoalupdown=0;
 
         // Choose to drive using either Tank Mode, or POV Mode
         // Comment out the method that's not used.  The default below is POV.
@@ -147,26 +164,69 @@ public class Teleop_Basic_Iterative extends OpMode
         double drive = gamepad1.left_stick_y;
         double strafe  =  gamepad1.left_stick_x;
         double turn  =  -gamepad1.right_stick_x;
-        double upDown = gamepad2.left_stick_y;
 
-       /*
-       if(gamepad1.left_trigger>0||gamepad1.right_trigger>0){
+        if(gamepad1.dpad_up){
+            wobbleGoalupdown = 0.7;
+        }
+        else if(gamepad1.dpad_down){
+            wobbleGoalupdown = -0.7;
+        }
+        else {
+            wobbleGoalupdown = 0;
+        }
+
+        if (gamepad1.dpad_right){//move arm down by 1000 ticks
+            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            hardwarePushBot.wobbleGoalArm.setTargetPosition(hardwarePushBot.wobbleGoalArm.getCurrentPosition()+3000);
+
+            hardwarePushBot.wobbleGoalArm.setPower(0.5);
+
+            // wait for move to complete
+            while (hardwarePushBot.wobbleGoalArm.isBusy() ) {
+
+                // Display it for the driver.
+                telemetry.addData("Wobble Pos", hardwarePushBot.wobbleGoalArm.getCurrentPosition());
+                telemetry.update();
+            }
+            hardwarePushBot.wobbleGoalArm.setPower(0);
+        }
+        if (gamepad1.dpad_left){// move arm up by 1000 ticks
+            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            hardwarePushBot.wobbleGoalArm.setTargetPosition(hardwarePushBot.wobbleGoalArm.getCurrentPosition()-3000);
+
+            hardwarePushBot.wobbleGoalArm.setPower(0.5);
+
+            // wait for move to complete
+            while (hardwarePushBot.wobbleGoalArm.isBusy() ) {
+
+                // Display it for the driver.
+                telemetry.addData("Wobble Pos", hardwarePushBot.wobbleGoalArm.getCurrentPosition());
+                telemetry.update();
+            }
+            hardwarePushBot.wobbleGoalArm.setPower(0);
+        }
+        if(gamepad1.x){
+            hardwarePushBot.wobbleGoalFinger.setPosition(1.0);
+        }
+        if(gamepad1.b){
+            hardwarePushBot.wobbleGoalFinger.setPosition(0.0);
+        }
+
+        hardwarePushBot.wobbleGoalArm.setPower(wobbleGoalupdown); // Wobble Goal Arm Position Control
+
+       if(gamepad1.right_bumper){
             masterPowerScaleDrive = 1.0; //Range.clip(masterPowerScaleDrive + 0.2, 0.2, 1.0);
         }
 
-       if(gamepad1.left_bumper||gamepad1.right_bumper){
+       if(gamepad1.left_bumper){
             masterPowerScaleDrive = 0.4; //Range.clip(masterPowerScaleDrive - 0.2, 0.2, 1.0);
         }
-        if(gamepad1.start){
-            masterPowerScaleTurn = 0.35; // Range.clip(masterPowerScaleTurn + 0.2, 0.2, 1.0);
-        }
-        if(gamepad1.back){
-            masterPowerScaleTurn = 0.2; //Range.clip(masterPowerScaleTurn - 0.2, 0.2, 1.0);
-        }
-        */
+
         drive = drive*masterPowerScaleDrive;
         strafe = strafe*masterPowerScaleDrive;
-        turn = turn*masterPowerScaleTurn;
+        turn = turn*0.6;
 
         leftFrontPower   = Range.clip(drive+turn-strafe , -1.0, 1.0);
         rightFrontPower  = Range.clip(drive-turn+strafe , -1.0, 1.0);
@@ -174,41 +234,15 @@ public class Teleop_Basic_Iterative extends OpMode
         rightRearPower   = Range.clip(drive-turn-strafe , -1.0, 1.0);
 
 
-        if (gamepad1.start){
-            //set the hand to an initial position
-            hardwarePushBot.wobbleGoalFinger.setPosition(0.0);
-        }
-        if (gamepad1.back){
-            //set the front arm to an initial position
-            hardwarePushBot.wobbleGoalFinger.setPosition(1.0);
-        }
+
         if (gamepad2.left_bumper){
             //set the front arm to an initial position
-            hardwarePushBot.wobbleGoalFinger.setPosition(1.0);
+            hardwarePushBot.shootingTrigger.setPosition(0.0);
         }
         if (gamepad2.right_bumper){
             //set the front arm to an initial position
-            hardwarePushBot.wobbleGoalFinger.setPosition(0.0);
-        }
-
-        hardwarePushBot.wobbleGoalArm.setPower(upDown);
-
-        if (gamepad2.a){
-            hardwarePushBot.shootingWheel.setPower(1);
-        }
-
-        if (gamepad2.x){
-            hardwarePushBot.shootingWheel.setPower(0);
-        }
-
-        if (gamepad2.b){
-            hardwarePushBot.shootingWheel.setPower(0.8);
-        }
-
-      /*  if (gamepad2.start){
             hardwarePushBot.shootingTrigger.setPosition(1.0);
         }
-        */
 
 
         if (gamepad2.start){
@@ -218,6 +252,20 @@ public class Teleop_Basic_Iterative extends OpMode
         if (gamepad2.back){
             hardwarePushBot.ringIntake.setPower(0);
         }
+
+        if (gamepad2.a){
+            hardwarePushBot.shootingWheel.setPower(0.0);
+        }
+        if (gamepad2.b){
+            hardwarePushBot.shootingWheel.setPower(0.9);
+        }
+        if (gamepad2.y){
+            hardwarePushBot.shootingWheel.setPower(1.0);
+        }
+
+
+
+
 
 
 /***
@@ -253,6 +301,17 @@ public class Teleop_Basic_Iterative extends OpMode
         telemetry.update();
 
 
+
+        // change the background color to match the color detected by the RGB sensor.
+        // pass a reference to the hue, saturation, and value array as an argument
+        // to the HSVToColor method.
+ /*       relativeLayout.post(new Runnable() {
+            public void run() {
+                relativeLayout.setBackgroundColor(Color.HSVToColor(0xff, values));
+            }
+        });
+  */
+
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "LF (%.2f), RF (%.2f), LR (%.2f), RR (%.2f)", leftFrontPower, rightFrontPower, leftRearPower, rightRearPower);
@@ -265,7 +324,6 @@ public class Teleop_Basic_Iterative extends OpMode
     @Override
     public void stop() {
     }
-
     private void initHardwareMap() {
         hardwarePushBot.mapWheels(hardwareMap);
         hardwarePushBot.mapColorSensor(hardwareMap);
