@@ -88,7 +88,10 @@ public class RightRedTargetZones_OD_FM_WG extends LinearOpMode {
         switch (targetZone) {
             case 1:
                 //Go to the right
-                drivewWithFeedback_FBM(0, 0.4, 1.5);
+                drivewWithFeedback_FBM(0, 0.75, 0.75);
+
+                //Move forward fast
+                drivewWithFeedback_FBM(-0.75, 0, 1.25);
 
                 //Go to Red
                 drivewWithFeedback_FBM_Colors(-0.5, 0.0, 4.0, "RED");
@@ -97,7 +100,7 @@ public class RightRedTargetZones_OD_FM_WG extends LinearOpMode {
                 drivewWithFeedback_FBM(0.4, 0, 0.5);
 
                 //Wobble Goal arm go down
-                moveWobbleGoalArm(0.5, 2.3);
+                moveWobbleGoalArm(1.0, 0.85);
 
                 //Drop wobble goal into target zone
                 hardwarePushBot.wobbleGoalFinger.setPosition(0.0);
@@ -109,7 +112,7 @@ public class RightRedTargetZones_OD_FM_WG extends LinearOpMode {
                 hardwarePushBot.wobbleGoalFinger.setPosition(1.0);
 
                 //Wobble Goal arm go up
-                moveWobbleGoalArm(-0.5, 2.5);
+                moveWobbleGoalArm(-1.0, 0.85);
 
                 //Turn on shooting wheel
                 hardwarePushBot.shootingWheel.setPower(1);
@@ -117,10 +120,10 @@ public class RightRedTargetZones_OD_FM_WG extends LinearOpMode {
                 sleep(2000);
 
                 //Go to the left
-                drivewWithFeedback_FBM(0, -0.4, 1.5);
+                drivewWithFeedback_FBM(0, -0.75, 0.75);
 
                 //Move forward a little
-                drivewWithFeedback_FBM(-0.4, 0, 0.3);
+                drivewWithFeedback_FBM(-0.5, 0, 0.25);
 
                 //Shoot rings
                 shootRingsIntoHighGoal();
@@ -131,7 +134,10 @@ public class RightRedTargetZones_OD_FM_WG extends LinearOpMode {
                 break;
             case 2:
                 //Go to the right
-                drivewWithFeedback_FBM(0, 0.4, 1.5);
+                drivewWithFeedback_FBM(0, 0.75, 0.75);
+
+                //Move forward fast
+                drivewWithFeedback_FBM(-0.75, 0, 1.25);
 
                 //Go to Red
                 drivewWithFeedback_FBM_Colors(-0.5, 0.0, 4.0, "RED");
@@ -140,17 +146,17 @@ public class RightRedTargetZones_OD_FM_WG extends LinearOpMode {
                 drivewWithFeedback_FBM_Colors(-0.5, 0.0, 4.0, "RED");
 
                 //Move Forward
-                drivewWithFeedback_FBM(-0.5, 0, 0.5);
+                drivewWithFeedback_FBM(-0.75, 0, 0.3);
 
                 //Go to Red
                 drivewWithFeedback_FBM_Colors(0, -0.5, 4.0, "RED");
 
 
                 //Move back
-                drivewWithFeedback_FBM(0.4, 0, 1.5);
+                drivewWithFeedback_FBM(0.75, 0, 0.5);
 
                 //Wobble Goal arm go down
-                moveWobbleGoalArm(0.5, 2.3);
+                moveWobbleGoalArm(1.0, 0.85);
 
                 //Drop wobble goal into target zone
                 hardwarePushBot.wobbleGoalFinger.setPosition(0.0);
@@ -162,7 +168,7 @@ public class RightRedTargetZones_OD_FM_WG extends LinearOpMode {
                 hardwarePushBot.wobbleGoalFinger.setPosition(1.0);
 
                 //Wobble Goal arm go up
-                moveWobbleGoalArm(-0.5, 2.5);
+                moveWobbleGoalArm(-1.0, 0.85);
 
                 //Turn on shooting wheel for high goal
                 hardwarePushBot.shootingWheel.setPower(1);
@@ -171,7 +177,7 @@ public class RightRedTargetZones_OD_FM_WG extends LinearOpMode {
                 drivewWithFeedback_FBM_Colors(0.5, 0.0, 2.5, "WHITE");
 
                 //Move back a little
-                //drivewWithFeedback_FBM(0.4, 0, 0.75);
+                drivewWithFeedback_FBM(0.6, 0, 0.45);
 
                 //Go to the right
                 drivewWithFeedback_FBM(0, 0.4, 0.5);
@@ -184,33 +190,44 @@ public class RightRedTargetZones_OD_FM_WG extends LinearOpMode {
                 break;
             case 3:
                 //Go to the right
-                drivewWithFeedback_FBM(0, 0.4, 1.5);
+                drivewWithFeedback_FBM(0, 0.75, 0.75);
 
-                //Detect Red 3 times
-                drivewWithFeedback_FBM_Colors(-0.5, 0.0, 6.0, "RED");
-                drivewWithFeedback_FBM_Colors(-0.5, 0.0, 2.0, "RED");
-                drivewWithFeedback_FBM_Colors(-0.5, 0.0, 5.0, "RED");
+                //Move forward fast
+                drivewWithFeedback_FBM(-0.75, 0, 1.25);
+
+                //Go to Red
+                drivewWithFeedback_FBM_Colors(-0.5, 0.0, 4.0, "RED");
+                drivewWithFeedback_FBM_Colors(-0.5, 0.0, 4.0, "RED");
+
+                //Move forward
+                drivewWithFeedback_FBM(-0.5, 0, 0.8);
 
                 //Move to red again
-                drivewWithFeedback_FBM_Colors(0.5, 0.0, 4.0, "RED");
+                //drivewWithFeedback_FBM_Colors(0.5, 0.0, 4.0, "RED");
 
                 //Move back a little
                 //drivewWithFeedback_FBM(0.4, 0, 0.5);
 
                 //Wobble Goal arm go down
-                moveWobbleGoalArm(0.5, 2.3);
+                moveWobbleGoalArm(1.0, 0.87);
 
                 //Drop wobble goal into target zone
                 hardwarePushBot.wobbleGoalFinger.setPosition(0.0);
 
-                //Move to red
-                drivewWithFeedback_FBM_Colors(0.5, 0.0, 4.0, "RED");
+                //Move back
+                drivewWithFeedback_FBM(0.5, 0, 0.3  );
 
                 //Close claw
                 hardwarePushBot.wobbleGoalFinger.setPosition(1.0);
 
                 //Wobble Goal arm go up
-                moveWobbleGoalArm(-0.5, 2.5);
+                moveWobbleGoalArm(-1.0, 0.87);
+
+                //Move back
+                drivewWithFeedback_FBM(0.75, 0, 0.5);
+
+                //Move to red
+                drivewWithFeedback_FBM_Colors(0.5, 0.0, 4.0, "RED");
 
                 //Turn on the shooting mechanism
                 hardwarePushBot.shootingWheel.setPower(1);
@@ -222,13 +239,16 @@ public class RightRedTargetZones_OD_FM_WG extends LinearOpMode {
                 drivewWithFeedback_FBM(0.4, 0, 1.0);
 
                 //Go to the left
-                drivewWithFeedback_FBM(0, -0.4, 1.5);
+                drivewWithFeedback_FBM(0, -0.75, 0.68);
+
+                //Move back a little
+                drivewWithFeedback_FBM(0.4, 0, 0.15);
 
                 //Shoot all 3 rings into the high goal
                 shootRingsIntoHighGoal();
 
                 //Move forward a little
-                drivewWithFeedback_FBM(-0.5, 0, 0.4);
+                drivewWithFeedback_FBM(-0.75, 0, 0.4);
                 break;
         }
     }
@@ -437,10 +457,10 @@ public class RightRedTargetZones_OD_FM_WG extends LinearOpMode {
     public void shootRingsIntoHighGoal() {
         for (int i = 1; i <= 3; i++) {
             hardwarePushBot.shootingTrigger.setPosition(1.0);
-            sleep(1000);
+            sleep(750);
 
             hardwarePushBot.shootingTrigger.setPosition(0.0);
-            sleep(1000);
+            sleep(750);
         }
     }
 }
