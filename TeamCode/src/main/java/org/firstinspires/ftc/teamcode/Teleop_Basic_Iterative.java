@@ -39,8 +39,10 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -118,6 +120,7 @@ public class Teleop_Basic_Iterative extends OpMode
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
+        getVoltage();
         telemetry.update();
     }
 
@@ -183,10 +186,12 @@ public class Teleop_Basic_Iterative extends OpMode
             hardwarePushBot.wobbleGoalArm.setPower(0.5);
 
             // wait for move to complete
-            while (hardwarePushBot.wobbleGoalArm.isBusy() ) {
+            //if touchsensor.getState == true, then touch sensor is not pressed
+            while (hardwarePushBot.wobbleGoalArm.isBusy() && hardwarePushBot.touchSensorWaFront.getState() ) {
 
                 // Display it for the driver.
                 telemetry.addData("Wobble Pos", hardwarePushBot.wobbleGoalArm.getCurrentPosition());
+                telemetry.addData("touch sens", hardwarePushBot.touchSensorWaFront.getState());
                 telemetry.update();
             }
             hardwarePushBot.wobbleGoalArm.setPower(0);
@@ -199,7 +204,7 @@ public class Teleop_Basic_Iterative extends OpMode
             hardwarePushBot.wobbleGoalArm.setPower(0.5);
 
             // wait for move to complete
-            while (hardwarePushBot.wobbleGoalArm.isBusy() ) {
+            while (hardwarePushBot.wobbleGoalArm.isBusy() && hardwarePushBot.touchSensorWaBack.getState()) {
 
                 // Display it for the driver.
                 telemetry.addData("Wobble Pos", hardwarePushBot.wobbleGoalArm.getCurrentPosition());
@@ -330,6 +335,9 @@ public class Teleop_Basic_Iterative extends OpMode
         hardwarePushBot.mapRingIntake(hardwareMap);
         hardwarePushBot.mapWobbleArm(hardwareMap);
         hardwarePushBot.mapShootingWheel(hardwareMap);
+        hardwarePushBot.mapTouchSensor(hardwareMap);
+
+        hardwarePushBot.touchSensorWaFront.setMode(DigitalChannel.Mode.INPUT);
 
         hardwarePushBot.leftColorSensor.enableLed(true);
         hardwarePushBot.rightColorSensor.enableLed(true);
@@ -340,6 +348,23 @@ public class Teleop_Basic_Iterative extends OpMode
         hardwarePushBot.leftBackWheel.setDirection(DcMotor.Direction.REVERSE);
         hardwarePushBot.rightFrontWheel.setDirection(DcMotor.Direction.REVERSE);
         hardwarePushBot.rightBackWheel.setDirection(DcMotor.Direction.FORWARD);
+    }
+
+    public void getVoltage() {
+        // Computes the current battery voltage
+
+       double result = Double.POSITIVE_INFINITY;
+       for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+                double voltage = sensor.getVoltage();
+                telemetry.addData("current Battery voltage is " , voltage);
+                telemetry.update();
+
+                if (voltage > 0) {
+
+                }
+            }
+
+
     }
 }
 
