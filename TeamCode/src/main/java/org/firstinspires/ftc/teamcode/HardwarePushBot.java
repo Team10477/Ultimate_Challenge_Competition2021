@@ -108,6 +108,9 @@ public class HardwarePushBot {
          touchSensorRight = hwMap.get(DigitalChannel.class, "touch_sensor_right");
         touchSensorWaFront = hwMap.get(DigitalChannel.class, "touch_sensor_wa_front");
         touchSensorWaBack = hwMap.get(DigitalChannel.class, "touch_sensor_wa_back");
+        touchSensorRight.setMode(DigitalChannel.Mode.INPUT);
+        touchSensorWaFront.setMode(DigitalChannel.Mode.INPUT);
+        touchSensorWaFront.setMode(DigitalChannel.Mode.INPUT);
     }
 
     public void mapColorSensor(HardwareMap hwMap) {
