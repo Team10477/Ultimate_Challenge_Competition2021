@@ -158,6 +158,7 @@ public class Teleop_Basic_Iterative extends OpMode
         double hue, saturation, value;
         double lightIntensity;
         double wobbleGoalupdown=0;
+        double battVoltage = 0;
 
         // Choose to drive using either Tank Mode, or POV Mode
         // Comment out the method that's not used.  The default below is POV.
@@ -169,9 +170,11 @@ public class Teleop_Basic_Iterative extends OpMode
         double turn  =  -gamepad1.right_stick_x;
 
         if(gamepad1.dpad_up){
+            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             wobbleGoalupdown = 0.7;
         }
         else if(gamepad1.dpad_down){
+            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             wobbleGoalupdown = -0.7;
         }
         else {
@@ -180,8 +183,9 @@ public class Teleop_Basic_Iterative extends OpMode
 
         if (gamepad1.dpad_right){//move arm down by 1000 ticks
             hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             hardwarePushBot.wobbleGoalArm.setTargetPosition(hardwarePushBot.wobbleGoalArm.getCurrentPosition()+3000);
+            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
             hardwarePushBot.wobbleGoalArm.setPower(0.5);
 
@@ -198,8 +202,9 @@ public class Teleop_Basic_Iterative extends OpMode
         }
         if (gamepad1.dpad_left){// move arm up by 1000 ticks
             hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             hardwarePushBot.wobbleGoalArm.setTargetPosition(hardwarePushBot.wobbleGoalArm.getCurrentPosition()-3000);
+            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
             hardwarePushBot.wobbleGoalArm.setPower(0.5);
 
@@ -258,14 +263,16 @@ public class Teleop_Basic_Iterative extends OpMode
             hardwarePushBot.ringIntake.setPower(0);
         }
 
+        battVoltage= getVoltage();
+
         if (gamepad2.a){
             hardwarePushBot.shootingWheel.setPower(0.0);
         }
         if (gamepad2.b){
-            hardwarePushBot.shootingWheel.setPower(0.9);
+            hardwarePushBot.shootingWheel.setPower(0.748-(battVoltage-12)*(0.748-0.62)/(1.95));
         }
         if (gamepad2.y){
-            hardwarePushBot.shootingWheel.setPower(1.0);
+            hardwarePushBot.shootingWheel.setPower(0.7);
         }
 
 
@@ -303,6 +310,7 @@ public class Teleop_Basic_Iterative extends OpMode
         telemetry.addData("Hue", "Hue (%.2f), Sat (%.2f), Val (%.2f)",hue, saturation, value);
         telemetry.addData("LightIntensity",lightIntensity);
         telemetry.addData("Arm Pos", hardwarePushBot.wobbleGoalArm.getCurrentPosition());
+        telemetry.addData("Wobble Power", 0.748-(battVoltage-12)*(0.748-0.62)/(1.95));
         telemetry.update();
 
 
@@ -350,19 +358,21 @@ public class Teleop_Basic_Iterative extends OpMode
         hardwarePushBot.rightBackWheel.setDirection(DcMotor.Direction.FORWARD);
     }
 
-    public void getVoltage() {
+    public double getVoltage() {
         // Computes the current battery voltage
 
        double result = Double.POSITIVE_INFINITY;
        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
                 double voltage = sensor.getVoltage();
-                telemetry.addData("current Battery voltage is " , voltage);
-                telemetry.update();
+
 
                 if (voltage > 0) {
-
+                    result = Math.min(result, voltage);
                 }
             }
+        telemetry.addData("current Battery voltage is " , result);
+        telemetry.update();
+       return result;
 
 
     }
