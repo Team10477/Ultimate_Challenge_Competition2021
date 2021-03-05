@@ -45,9 +45,9 @@ public class HardwarePushBot {
     /**
      * Touch Sensors
      **/
-    public DigitalChannel leftTouchSensor = null;
-    public DigitalChannel rightTouchSensor = null;
-    public DigitalChannel frontTouchSensor = null;
+    public DigitalChannel touchSensorRight = null;
+    public DigitalChannel touchSensorWaFront = null;
+    public DigitalChannel touchSensorWaBack = null;
 
     /**
      * Servos
@@ -105,7 +105,9 @@ public class HardwarePushBot {
     }
 
     public void mapTouchSensor(HardwareMap hwMap) {
-         frontTouchSensor = hwMap.get(DigitalChannel.class, "touch_sensor_front");  // Check servo config. in RC
+         touchSensorRight = hwMap.get(DigitalChannel.class, "touch_sensor_right");
+        touchSensorWaFront = hwMap.get(DigitalChannel.class, "touch_sensor_wa_front");
+        touchSensorWaBack = hwMap.get(DigitalChannel.class, "touch_sensor_wa_back");
     }
 
     public void mapColorSensor(HardwareMap hwMap) {
