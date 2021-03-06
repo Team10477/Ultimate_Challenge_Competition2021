@@ -39,8 +39,10 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -118,6 +120,7 @@ public class Teleop_Basic_Iterative extends OpMode
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
+        getVoltage();
         telemetry.update();
     }
 
@@ -155,6 +158,7 @@ public class Teleop_Basic_Iterative extends OpMode
         double hue, saturation, value;
         double lightIntensity;
         double wobbleGoalupdown=0;
+        double battVoltage = 0;
 
         // Choose to drive using either Tank Mode, or POV Mode
         // Comment out the method that's not used.  The default below is POV.
@@ -166,9 +170,11 @@ public class Teleop_Basic_Iterative extends OpMode
         double turn  =  -gamepad1.right_stick_x;
 
         if(gamepad1.dpad_up){
+            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             wobbleGoalupdown = 0.7;
         }
         else if(gamepad1.dpad_down){
+            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             wobbleGoalupdown = -0.7;
         }
         else {
@@ -177,29 +183,33 @@ public class Teleop_Basic_Iterative extends OpMode
 
         if (gamepad1.dpad_right){//move arm down by 1000 ticks
             hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             hardwarePushBot.wobbleGoalArm.setTargetPosition(hardwarePushBot.wobbleGoalArm.getCurrentPosition()+3000);
+            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
             hardwarePushBot.wobbleGoalArm.setPower(0.5);
 
             // wait for move to complete
-            while (hardwarePushBot.wobbleGoalArm.isBusy() ) {
+            //if touchsensor.getState == true, then touch sensor is not pressed
+            while (hardwarePushBot.wobbleGoalArm.isBusy() && hardwarePushBot.touchSensorWaFront.getState() ) {
 
                 // Display it for the driver.
                 telemetry.addData("Wobble Pos", hardwarePushBot.wobbleGoalArm.getCurrentPosition());
+                telemetry.addData("touch sens", hardwarePushBot.touchSensorWaFront.getState());
                 telemetry.update();
             }
             hardwarePushBot.wobbleGoalArm.setPower(0);
         }
         if (gamepad1.dpad_left){// move arm up by 1000 ticks
             hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             hardwarePushBot.wobbleGoalArm.setTargetPosition(hardwarePushBot.wobbleGoalArm.getCurrentPosition()-3000);
+            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
             hardwarePushBot.wobbleGoalArm.setPower(0.5);
 
             // wait for move to complete
-            while (hardwarePushBot.wobbleGoalArm.isBusy() ) {
+            while (hardwarePushBot.wobbleGoalArm.isBusy() && hardwarePushBot.touchSensorWaBack.getState()) {
 
                 // Display it for the driver.
                 telemetry.addData("Wobble Pos", hardwarePushBot.wobbleGoalArm.getCurrentPosition());
@@ -253,14 +263,16 @@ public class Teleop_Basic_Iterative extends OpMode
             hardwarePushBot.ringIntake.setPower(0);
         }
 
+        battVoltage= getVoltage();
+
         if (gamepad2.a){
             hardwarePushBot.shootingWheel.setPower(0.0);
         }
         if (gamepad2.b){
-            hardwarePushBot.shootingWheel.setPower(0.9);
+            hardwarePushBot.shootingWheel.setPower(0.748-(battVoltage-12)*(0.748-0.62)/(1.95));
         }
         if (gamepad2.y){
-            hardwarePushBot.shootingWheel.setPower(1.0);
+            hardwarePushBot.shootingWheel.setPower(0.7);
         }
 
 
@@ -298,6 +310,7 @@ public class Teleop_Basic_Iterative extends OpMode
         telemetry.addData("Hue", "Hue (%.2f), Sat (%.2f), Val (%.2f)",hue, saturation, value);
         telemetry.addData("LightIntensity",lightIntensity);
         telemetry.addData("Arm Pos", hardwarePushBot.wobbleGoalArm.getCurrentPosition());
+        telemetry.addData("Wobble Power", 0.748-(battVoltage-12)*(0.748-0.62)/(1.95));
         telemetry.update();
 
 
@@ -330,6 +343,9 @@ public class Teleop_Basic_Iterative extends OpMode
         hardwarePushBot.mapRingIntake(hardwareMap);
         hardwarePushBot.mapWobbleArm(hardwareMap);
         hardwarePushBot.mapShootingWheel(hardwareMap);
+        hardwarePushBot.mapTouchSensor(hardwareMap);
+
+        hardwarePushBot.touchSensorWaFront.setMode(DigitalChannel.Mode.INPUT);
 
         hardwarePushBot.leftColorSensor.enableLed(true);
         hardwarePushBot.rightColorSensor.enableLed(true);
@@ -340,6 +356,25 @@ public class Teleop_Basic_Iterative extends OpMode
         hardwarePushBot.leftBackWheel.setDirection(DcMotor.Direction.REVERSE);
         hardwarePushBot.rightFrontWheel.setDirection(DcMotor.Direction.REVERSE);
         hardwarePushBot.rightBackWheel.setDirection(DcMotor.Direction.FORWARD);
+    }
+
+    public double getVoltage() {
+        // Computes the current battery voltage
+
+       double result = Double.POSITIVE_INFINITY;
+       for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+                double voltage = sensor.getVoltage();
+
+
+                if (voltage > 0) {
+                    result = Math.min(result, voltage);
+                }
+            }
+        telemetry.addData("current Battery voltage is " , result);
+        telemetry.update();
+       return result;
+
+
     }
 }
 
