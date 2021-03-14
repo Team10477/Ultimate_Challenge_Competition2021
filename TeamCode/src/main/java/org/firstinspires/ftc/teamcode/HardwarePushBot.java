@@ -54,6 +54,7 @@ public class HardwarePushBot {
      **/
     public Servo wobbleGoalFinger = null;
     public Servo shootingTrigger = null;
+    public Servo wobbleGoalFinger2 = null;
 
    /* double leftFrontPower = 0;
     double rightFrontPower = 0;
@@ -97,6 +98,7 @@ public class HardwarePushBot {
     public void mapWobbleArm(HardwareMap hwMap) {
         wobbleGoalArm = hwMap.get(DcMotor.class, "wobble_arm");
         wobbleGoalFinger = hwMap.get(Servo.class, "wobble_finger");
+        wobbleGoalFinger2 = hwMap.get(Servo.class, "wobble_finger2");
     }
 
     public void mapShootingWheel(HardwareMap hwMap){
