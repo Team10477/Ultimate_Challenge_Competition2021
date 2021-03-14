@@ -109,6 +109,7 @@ public class Teleop_Basic_Iterative extends OpMode
 
 
         hardwarePushBot.wobbleGoalFinger.setPosition(0.0); // closed finger
+        hardwarePushBot.wobbleGoalFinger2.setPosition(0.0);
        // hardwarePushBot.wobbleGoalArm.setDirection(DcMotor.Direction.REVERSE);
         //hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
        // hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -153,6 +154,7 @@ public class Teleop_Basic_Iterative extends OpMode
         double rightRearPower;
         double wobbleArmPower;
         double wobbleFingerPower;
+        double wobbleFinger2Power;
         double wobbleArmPosition;
         double wobbleHandPower;
         double hue, saturation, value;
@@ -219,9 +221,11 @@ public class Teleop_Basic_Iterative extends OpMode
         }
         if(gamepad1.x){
             hardwarePushBot.wobbleGoalFinger.setPosition(1.0);
+            hardwarePushBot.wobbleGoalFinger2.setPosition(1.0);
         }
         if(gamepad1.b){
             hardwarePushBot.wobbleGoalFinger.setPosition(0.0);
+            hardwarePushBot.wobbleGoalFinger2.setPosition(0.0);
         }
 
         hardwarePushBot.wobbleGoalArm.setPower(wobbleGoalupdown); // Wobble Goal Arm Position Control
@@ -261,6 +265,18 @@ public class Teleop_Basic_Iterative extends OpMode
 
         if (gamepad2.back){
             hardwarePushBot.ringIntake.setPower(0);
+        }
+
+        if(gamepad2.dpad_down) {
+            hardwarePushBot.ringIntake.setPower(1);
+        }
+
+        if(gamepad2.dpad_up) {
+            hardwarePushBot.ringIntake.setPower(0);
+        }
+
+        if(gamepad2.dpad_right|| gamepad2.dpad_left) {
+            hardwarePushBot.ringIntake.setPower(-1);
         }
 
         battVoltage= getVoltage();
