@@ -201,7 +201,7 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
 
                 stopResetEncoder();
 
-                setTargetPosition(STRAFE_RIGHT,1600);
+                setTargetPosition(STRAFE_RIGHT,1550);
 
                 runToPosition(1);
 
