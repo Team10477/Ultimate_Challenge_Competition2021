@@ -54,7 +54,7 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
         while (opModeIsActive() && counter == 1) {
            targetZone =  ringIdentification.identifyRings(this.telemetry);
            goToTargetZones();
-            counter++;
+           counter++;
         }
         ringIdentification.deactivateTfod();
     }
@@ -201,7 +201,7 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
 
                 stopResetEncoder();
 
-                setTargetPosition(STRAFE_RIGHT,1300);
+                setTargetPosition(STRAFE_RIGHT,1550);
 
                 runToPosition(1);
 
@@ -215,14 +215,14 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
 
                setTargetPosition(WOBBLE_ARM_DOWN, 3100);
 
-               runToPositionForWobbleArm(0.75);
+               runToPositionForWobbleArm(1.0);
 
                hardwarePushBot.wobbleGoalFinger.setPosition(0);
 
                //4. Wobble Goal Arm up
                 setTargetPosition(WOBBLE_ARM_UP, 3100);
 
-                runToPositionForWobbleArm(0.75);
+                runToPositionForWobbleArm(1.0);
 
                 //5. Turn on shooting wheel.
               //  hardwarePushBot.shootingWheel.setPower(0.70);
@@ -234,18 +234,75 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
                 //6. Go back 0.5 using feedback
                 drivewWithFeedback_FBM_Colors(0.5, 0, 1.0, "RED");
 
-                //7. Strafe left using feedback
-                drivewWithFeedback_FBM(0, -0.35, 1.35);
+                //7. Strafe left the forward using feedback
+               drivewWithFeedback_FBM(0, -0.35, 1.65);
 
-                drivewWithFeedback_FBM(-0.5, 0, 0.25);
+               drivewWithFeedback_FBM(-0.5, 0, 0.45);
+                //stopResetEncoder();
+                //setTargetPosition(STRAFE_LEFT,1000);
+                //runToPosition(0.75);
+
+               // setTargetPosition(DRIVE_FORWARD,200);
+                //runToPosition(0.75);
 
                 //8.Shooting Rings
+                startShootingWheelByVoltage();
+                sleep(500);
                 for (int i=0; i < 3; i++) {
                     hardwarePushBot.shootingTrigger.setPosition(1);
                     sleep(500);
                     hardwarePushBot.shootingTrigger.setPosition(0);
                     sleep(500);
                 }
+                hardwarePushBot.shootingWheel.setPower(0); //turn off the shooting wheel
+
+                //9. Strafe Left
+                stopResetEncoder();
+                setTargetPosition(STRAFE_LEFT,1150);
+
+                runToPosition(1.0);
+
+                //10. Turn around 180 degrees
+
+                setTargetPosition(TURN_RIGHT,2700);
+                runToPosition(1.0);
+
+                //11. Move forward to the second wobble goal
+                setTargetPosition(DRIVE_FORWARD,1200);
+                runToPosition(1.0);
+
+                //12. Wobble Goal arm down
+
+                setTargetPosition(WOBBLE_ARM_DOWN, 3100);
+
+                runToPositionForWobbleArm(0.75);
+
+                hardwarePushBot.wobbleGoalFinger.setPosition(0);
+
+                //13. Move forward to pick up the second wobble goal
+                setTargetPosition(DRIVE_FORWARD,800);
+                runToPosition(1.0);
+
+                //14. close wobble finger
+                hardwarePushBot.wobbleGoalFinger.setPosition(1.0);
+                hardwarePushBot.wobbleGoalFinger2.setPosition(1.0);
+
+                hardwarePushBot.wobbleGoalArm.setPower(-0.7);
+                sleep(1000);
+                hardwarePushBot.wobbleGoalArm.setPower(0);
+
+                //15. Turn around 180 deg
+                setTargetPosition(TURN_RIGHT,2700);
+                runToPosition(1.0);
+
+                //16. move forward
+                setTargetPosition(DRIVE_FORWARD,2000);
+                runToPosition(1.0);
+
+                //15. Strafe Right
+                setTargetPosition(STRAFE_RIGHT,1500);
+                runToPosition(1.0);
+
 
                 break;
             case 1 : // Target zone B
@@ -290,9 +347,6 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
                 runToPosition(1);
 
                 runWithoutEncoder();
-
-                //6. Go back 0.5 using feedback
-                drivewWithFeedback_FBM_Colors(0.5, 0, 3.0, "RED");
 
                 //6. Go back 0.5 using feedback
                 drivewWithFeedback_FBM_Colors(0.5, 0, 3.0, "RED");
@@ -417,6 +471,20 @@ public class RightRedTargetZones_Encoder extends LinearOpMode {
         hardwarePushBot.mecanumDrive(0,0.0,0.0);
     }
 
+    public void drivewWithFeedback_FBMEncoder_Heading(double drive_power, double strafe_power, double desiredHeading){
+        hardwarePushBot.mecanumDrive(drive_power,strafe_power,0.0); // pass the parameters to a mecanumDrive method
+
+        elapsedTime.reset();
+        integralError=0;
+        while (opModeIsActive()){
+            heading = hardwarePushBot.getAngle();
+            error =heading - desiredHeading; // desrired - current heading is the error
+            integralError = integralError + error*0.025;
+
+            hardwarePushBot.mecanumDrive(drive_power,strafe_power,-(error*GAIN_PROP+integralError*GAIN_INT)); // the multiplication of 0.015 is a gain to make the turn power small (not close to 1, which is maximum)
+        }
+        hardwarePushBot.mecanumDrive(0,0.0,0.0);
+    }
 
     /**
      * Drive/Strafe with feedback loop and color detection.
