@@ -182,43 +182,6 @@ public class Teleop_Basic_Iterative extends OpMode
         else {
             wobbleGoalupdown = 0;
         }
-
-        if (gamepad1.dpad_right){//move arm down by 1000 ticks
-            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            hardwarePushBot.wobbleGoalArm.setTargetPosition(hardwarePushBot.wobbleGoalArm.getCurrentPosition()+3000);
-            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-
-            hardwarePushBot.wobbleGoalArm.setPower(0.5);
-
-            // wait for move to complete
-            //if touchsensor.getState == true, then touch sensor is not pressed
-            while (hardwarePushBot.wobbleGoalArm.isBusy() && hardwarePushBot.touchSensorWaFront.getState() ) {
-
-                // Display it for the driver.
-                telemetry.addData("Wobble Pos", hardwarePushBot.wobbleGoalArm.getCurrentPosition());
-                telemetry.addData("touch sens", hardwarePushBot.touchSensorWaFront.getState());
-                telemetry.update();
-            }
-            hardwarePushBot.wobbleGoalArm.setPower(0);
-        }
-        if (gamepad1.dpad_left){// move arm up by 1000 ticks
-            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            hardwarePushBot.wobbleGoalArm.setTargetPosition(hardwarePushBot.wobbleGoalArm.getCurrentPosition()-3000);
-            hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-
-            hardwarePushBot.wobbleGoalArm.setPower(0.5);
-
-            // wait for move to complete
-            while (hardwarePushBot.wobbleGoalArm.isBusy() && hardwarePushBot.touchSensorWaBack.getState()) {
-
-                // Display it for the driver.
-                telemetry.addData("Wobble Pos", hardwarePushBot.wobbleGoalArm.getCurrentPosition());
-                telemetry.update();
-            }
-            hardwarePushBot.wobbleGoalArm.setPower(0);
-        }
         if(gamepad1.x){
             hardwarePushBot.wobbleGoalFinger.setPosition(1.0);
             hardwarePushBot.wobbleGoalFinger2.setPosition(1.0);
@@ -285,7 +248,7 @@ public class Teleop_Basic_Iterative extends OpMode
             hardwarePushBot.shootingWheel.setPower(0.0);
         }
         if (gamepad2.b){
-            hardwarePushBot.shootingWheel.setPower(0.748-(battVoltage-12)*(0.748-0.62)/(1.95));
+            hardwarePushBot.shootingWheel.setPower(0.748-(battVoltage-12)*(0.76-0.62)/(1.95));
         }
         if (gamepad2.y){
             hardwarePushBot.shootingWheel.setPower(0.7);
