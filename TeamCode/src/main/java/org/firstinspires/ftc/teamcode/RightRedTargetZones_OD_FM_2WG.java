@@ -92,7 +92,7 @@ public class RightRedTargetZones_OD_FM_2WG extends LinearOpMode {
         switch (targetZone) {
             case 1:
                 //Go to the right
-                drivewWithFeedback_FBM(0, 0.75, 0.75);
+                drivewWithFeedback_FBM(0, 0.75, 0.80);
 
                 //Move forward fast
                 drivewWithFeedback_FBM(-0.75, 0, 1.25);
@@ -101,7 +101,7 @@ public class RightRedTargetZones_OD_FM_2WG extends LinearOpMode {
                 drivewWithFeedback_FBM_Colors(-0.5, 0.0, 4.0, "RED");
 
                 //Move back a little
-                drivewWithFeedback_FBM(0.4, 0, 0.25);
+                drivewWithFeedback_FBM(0.4, 0, 0.2);
 
                 //Wobble Goal arm go down
                 moveWobbleGoalArm(1.0, 0.85);
@@ -129,7 +129,7 @@ public class RightRedTargetZones_OD_FM_2WG extends LinearOpMode {
                 drivewWithFeedback_FBM(0, -0.75, 0.75);
 
                 //Move forward a little
-                drivewWithFeedback_FBM(-0.5, 0, 0.25);
+                drivewWithFeedback_FBM(-0.5, 0, 0.15);
 
                 //Shoot rings
                 shootRingsIntoHighGoal();
@@ -140,20 +140,20 @@ public class RightRedTargetZones_OD_FM_2WG extends LinearOpMode {
                 hardwarePushBot.shootingWheel.setPower(0);
 
                 //Move back fast
-                drivewWithFeedback_FBM(0.75, 0, 1.2);
+                drivewWithFeedback_FBM(0.75, 0, 1.357);
 
                 //Open claw
                 hardwarePushBot.wobbleGoalFinger.setPosition(0.0);
                 hardwarePushBot.wobbleGoalFinger2.setPosition(0.0);
 
                 //Wobble Goal arm go down
-                moveWobbleGoalArm(1.0, 1.13);
+                moveWobbleGoalArm(1.0, 1.09);
 
                 //Turn
                 mecanumDriveWithTimeout(0,0,-0.5, 1.17);
 
                 //Move Forward
-                mecanumDriveWithTimeout(-0.5,0,0,0.57);
+                mecanumDriveWithTimeout(-0.5,0,0,0.6);
 
                 //Close claw
                 hardwarePushBot.wobbleGoalFinger.setPosition(1.0);
@@ -170,7 +170,7 @@ public class RightRedTargetZones_OD_FM_2WG extends LinearOpMode {
                 mecanumDriveWithTimeout(0, 0,0.5, 0.65);
 
                 //Move forward without feed back movement
-                mecanumDriveWithTimeout(-0.85,0,0,1.35);
+                mecanumDriveWithTimeout(-0.85,0,0,1.545);
 
                 //Wobble Goal arm go down
                 moveWobbleGoalArm(1.0, 0.85);
