@@ -17,8 +17,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-@Autonomous(name="Encoder-Detect Red Right Target Zones")
-public class RightRedTargetZones_Encoder_detect extends LinearOpMode {
+@Autonomous(name="Encoder-Imu-Detect Red Right Target Zones")
+public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
 
     private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Quad";
@@ -186,6 +186,23 @@ public class RightRedTargetZones_Encoder_detect extends LinearOpMode {
 
     }
 
+    public void runToPosition_FBM(double drivePower, double strafePower) {
+        runToPositionMode();
+
+        drivewWithFeedback_Encoders(drivePower,strafePower);
+       // hardwarePushBot.setWheelPower(power, power, power, power);
+
+        while (opModeIsActive() && (hardwarePushBot.leftFrontWheel.isBusy() ||
+                hardwarePushBot.rightFrontWheel.isBusy() && hardwarePushBot.leftBackWheel.isBusy() &&
+                        hardwarePushBot.rightBackWheel.isBusy())) {
+            telemetry.addData("Current position right front", hardwarePushBot.rightFrontWheel.getCurrentPosition());
+            telemetry.update();
+        }
+     //   hardwarePushBot.setWheelPower(0.0, 0.0, 0.0, 0.0);
+        drivewWithFeedback_Encoders(0,0);
+
+    }
+
     public void runToPositionForWobbleArm(double power) {
         hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -211,10 +228,12 @@ public class RightRedTargetZones_Encoder_detect extends LinearOpMode {
             case 1: //Target zone A
                stopResetEncoder(); //Strafe Right using encoder counts.
                setTargetPosition(STRAFE_RIGHT,1320);
-               runToPosition(1);
+              // runToPosition(1);
+                runToPosition_FBM(1,0);
 
                setTargetPosition(DRIVE_FORWARD,3800); //Drive forward using encoder counts.
-               runToPosition(1);
+             //  runToPosition(1);
+                runToPosition_FBM(1,0);
 
                setTargetPosition(WOBBLE_ARM_DOWN, 3100);  //Move Wobblearm down using encoder counts.
                runToPositionForWobbleArm(1.0);
@@ -251,7 +270,8 @@ public class RightRedTargetZones_Encoder_detect extends LinearOpMode {
                 stopResetEncoder();  //Start the encoder.
 
                 setTargetPosition(STRAFE_LEFT,1175);  //Strafe left using encoder counts.
-                runToPosition(1.0);
+               // runToPosition(1.0);
+                runToPosition_FBM(0, 1.0);
 
                 setTargetPosition(TURN_RIGHT,2700);  // Turn around 180 degrees to get second wobble goal using enocder.
                 runToPosition(1.0);
@@ -263,7 +283,8 @@ public class RightRedTargetZones_Encoder_detect extends LinearOpMode {
                 hardwarePushBot.wobbleGoalFinger2.setPosition(0);
 
                 setTargetPosition(DRIVE_FORWARD,1750);  // Drive forward towards second wobble goal using encoder.
-                runToPosition(1.0);
+             //   runToPosition(1.0);
+                runToPosition_FBM(1.0, 0);
 
                 hardwarePushBot.wobbleGoalFinger.setPosition(1.0);  // Close the finger.
                 hardwarePushBot.wobbleGoalFinger2.setPosition(1.0);
@@ -273,13 +294,16 @@ public class RightRedTargetZones_Encoder_detect extends LinearOpMode {
                 runToPositionForWobbleArm(1.0);
 
                 setTargetPosition(TURN_RIGHT,2700);  // Turn around 180 degrees to go to target zone
-                runToPosition(1.0);
+              //  runToPosition(1.0);
+                runToPosition_FBM(1.0, 0);
 
                 setTargetPosition(DRIVE_FORWARD,2350);  // Drive forward
-                runToPosition(1.0);
+           //     runToPosition(1.0);
+                runToPosition_FBM(1.0, 0);
 
                 setTargetPosition(STRAFE_RIGHT,1700);  // Strafe right to target zone A
-                runToPosition(1.0);
+           //     runToPosition(1.0);
+                runToPosition_FBM(0, 1.0);
 
                 setTargetPosition(WOBBLE_ARM_DOWN, 1000);  // Move the warm slightly up to avoid wobble arm damage.
                 runToPositionForWobbleArm(1.0);
@@ -414,6 +438,24 @@ public class RightRedTargetZones_Encoder_detect extends LinearOpMode {
         hardwarePushBot.mecanumDrive(0,0.0,0.0);
     }
 
+    /**
+     * Drive/Strafe with feedback loop and color detection.
+     * @param drive_power
+     * @param strafe_power
+     */
+
+    public void drivewWithFeedback_Encoders(double drive_power, double strafe_power){
+        hardwarePushBot.mecanumDrive(drive_power,strafe_power,0.0); // pass the parameters to a mecanumDrive method
+        elapsedTime.reset();
+        integralError=0;
+        while (opModeIsActive() ){
+            heading = hardwarePushBot.getAngle();
+            error = heading - 0; // desrired - current heading is the error
+            integralError = integralError + error*0.025;
+            hardwarePushBot.mecanumDrive(drive_power,strafe_power,-(error*GAIN_PROP+integralError*GAIN_INT)); // the multiplication of 0.015 is a gain to make the turn power small (not close to 1, which is maximum)
+        }
+        hardwarePushBot.mecanumDrive(0,0.0,0.0);
+    }
     /**
      * Drive/Strafe with feedback loop and color detection.
      * @param drive_power
