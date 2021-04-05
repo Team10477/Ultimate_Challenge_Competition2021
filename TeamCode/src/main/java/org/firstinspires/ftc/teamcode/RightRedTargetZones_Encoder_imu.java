@@ -61,6 +61,10 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
     static int WOBBLE_ARM_UP = 5;
     static int TURN_RIGHT = 6;
     static int TURN_LEFT = 7;
+    static int DIAG_RIGHT_FRONT = 8;
+    static int DIAG_LEFT_FRONT = 9;
+    static int DIAG_LEFT_BACK = 10;
+    static int DIAG_RIGHT_BACK = 11;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -159,6 +163,26 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
             hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() + position);
             hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() - position);
             hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() - position);
+        } else if (action == 8) { //diagonal right front
+            hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() + position);
+            hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() + 0);
+            hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() +0 );
+            hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() + position);
+        }else if (action == 9) { //diagonal left front
+            hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() + 0);
+            hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() + position);
+            hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() + position);
+            hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() + 0);
+        }else if (action == 10) { //diagonal left back
+            hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() - position);
+            hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() +0);
+            hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() +0);
+            hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() - position);
+        }else if (action == 11) { //diagonal right back
+            hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() + 0);
+            hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() - position);
+            hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() - position);
+            hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() + 0);
         }
 
     }
@@ -173,12 +197,19 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
 
     public void runToPosition(double power) {
         runToPositionMode();
+        // Addition to set the end of encoder feedback to float
+
+        hardwarePushBot.leftFrontWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hardwarePushBot.rightFrontWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hardwarePushBot.leftBackWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hardwarePushBot.rightBackWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         hardwarePushBot.setWheelPower(power, power, power, power);
 
-        while (opModeIsActive() && (hardwarePushBot.leftFrontWheel.isBusy() ||
-                hardwarePushBot.rightFrontWheel.isBusy() && hardwarePushBot.leftBackWheel.isBusy() &&
-                hardwarePushBot.rightBackWheel.isBusy())) {
+        while (opModeIsActive() && (hardwarePushBot.leftFrontWheel.isBusy() &&
+               hardwarePushBot.rightFrontWheel.isBusy() && hardwarePushBot.leftBackWheel.isBusy() &&
+                hardwarePushBot.rightBackWheel.isBusy()
+        )) {
             telemetry.addData("Current position right front", hardwarePushBot.rightFrontWheel.getCurrentPosition());
             telemetry.update();
         }
@@ -189,14 +220,22 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
     public void runToPosition_FBM(double drivePower, double strafePower) {
         runToPositionMode();
 
-        drivewWithFeedback_Encoders(drivePower,strafePower);
-       // hardwarePushBot.setWheelPower(power, power, power, power);
+        //drivewWithFeedback_Encoders(drivePower,strafePower);
+       //hardwarePushBot.setWheelPower(power, power, power, power);
 
-        while (opModeIsActive() && (hardwarePushBot.leftFrontWheel.isBusy() ||
+        hardwarePushBot.mecanumDrive(drivePower,strafePower,0.0); // pass the parameters to a mecanumDrive method
+        elapsedTime.reset();
+        integralError=0;
+
+        while (opModeIsActive() && (hardwarePushBot.leftFrontWheel.isBusy() &&
                 hardwarePushBot.rightFrontWheel.isBusy() && hardwarePushBot.leftBackWheel.isBusy() &&
                         hardwarePushBot.rightBackWheel.isBusy())) {
             telemetry.addData("Current position right front", hardwarePushBot.rightFrontWheel.getCurrentPosition());
             telemetry.update();
+            heading = hardwarePushBot.getAngle();
+            error = heading - 0; // desrired - current heading is the error
+            integralError = integralError + error*0.025;
+            hardwarePushBot.mecanumDrive(drivePower,strafePower,-(error*GAIN_PROP+integralError*GAIN_INT)); // the multiplication of 0.015 is a gain to make the turn power small (not close to 1, which is maximum)
         }
      //   hardwarePushBot.setWheelPower(0.0, 0.0, 0.0, 0.0);
         drivewWithFeedback_Encoders(0,0);
@@ -226,21 +265,37 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
     public void goToTargetZones() {
         switch (targetZone) {
             case 1: //Target zone A
-               stopResetEncoder(); //Strafe Right using encoder counts.
+               /*stopResetEncoder(); //Strafe Right using encoder counts.
                setTargetPosition(STRAFE_RIGHT,1320);
-              // runToPosition(1);
-                runToPosition_FBM(1,0);
+                //setTargetPosition(STRAFE_RIGHT,3320);
+              runToPosition(1);
+              //runToPosition_FBM(1,0);*/
+                stopResetEncoder(); //
 
+                setTargetPosition(DIAG_RIGHT_FRONT,1320);
+                runToPosition(1);
+
+                setTargetPosition(DIAG_LEFT_FRONT,1320);
+                runToPosition(1);
+
+                setTargetPosition(DIAG_RIGHT_BACK,1320);
+                runToPosition(1);
+
+                setTargetPosition(DIAG_LEFT_FRONT,1320);
+                runToPosition(1);
+
+                break;
+/*
                setTargetPosition(DRIVE_FORWARD,3800); //Drive forward using encoder counts.
-             //  runToPosition(1);
-                runToPosition_FBM(1,0);
+             runToPosition(1);
+             //runToPosition_FBM(1,0);
 
                setTargetPosition(WOBBLE_ARM_DOWN, 3100);  //Move Wobblearm down using encoder counts.
                runToPositionForWobbleArm(1.0);
 
                hardwarePushBot.wobbleGoalFinger.setPosition(0);  // Open the finger to release the wobble goal.
                hardwarePushBot.wobbleGoalFinger2.setPosition(0);
-               sleep(250);
+               sleep(100);
 
                setTargetPosition(WOBBLE_ARM_UP, 3100);  // Move wobble goal arm up using encoder counts.
                runToPositionForWobbleArm(1.0);
@@ -270,8 +325,8 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
                 stopResetEncoder();  //Start the encoder.
 
                 setTargetPosition(STRAFE_LEFT,1175);  //Strafe left using encoder counts.
-               // runToPosition(1.0);
-                runToPosition_FBM(0, 1.0);
+               runToPosition(1.0);
+               //runToPosition_FBM(0, 1.0);
 
                 setTargetPosition(TURN_RIGHT,2700);  // Turn around 180 degrees to get second wobble goal using enocder.
                 runToPosition(1.0);
@@ -283,8 +338,8 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
                 hardwarePushBot.wobbleGoalFinger2.setPosition(0);
 
                 setTargetPosition(DRIVE_FORWARD,1750);  // Drive forward towards second wobble goal using encoder.
-             //   runToPosition(1.0);
-                runToPosition_FBM(1.0, 0);
+             runToPosition(1.0);
+             //runToPosition_FBM(1.0, 0);
 
                 hardwarePushBot.wobbleGoalFinger.setPosition(1.0);  // Close the finger.
                 hardwarePushBot.wobbleGoalFinger2.setPosition(1.0);
@@ -294,16 +349,16 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
                 runToPositionForWobbleArm(1.0);
 
                 setTargetPosition(TURN_RIGHT,2700);  // Turn around 180 degrees to go to target zone
-              //  runToPosition(1.0);
-                runToPosition_FBM(1.0, 0);
+              runToPosition(1.0);
+              //  runToPosition_FBM(1.0, 0);
 
                 setTargetPosition(DRIVE_FORWARD,2350);  // Drive forward
-           //     runToPosition(1.0);
-                runToPosition_FBM(1.0, 0);
+              runToPosition(1.0);
+              //  runToPosition_FBM(1.0, 0);
 
                 setTargetPosition(STRAFE_RIGHT,1700);  // Strafe right to target zone A
-           //     runToPosition(1.0);
-                runToPosition_FBM(0, 1.0);
+               runToPosition(1.0);
+               // runToPosition_FBM(0, 1.0);
 
                 setTargetPosition(WOBBLE_ARM_DOWN, 1000);  // Move the warm slightly up to avoid wobble arm damage.
                 runToPositionForWobbleArm(1.0);
@@ -320,7 +375,7 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
 
                 drivewWithFeedback_FBM(-0.5, 0, 0.25); //Slightly move forward to adjust and get ready fo
 
-                break;
+                break;*/
             case 2 : // Target zone B
 
                 stopResetEncoder(); // Strafe Right.
