@@ -235,7 +235,8 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
 
                startShootingWheelUsingEncoder();  //Adjust shooting wheel based on battery voltage before starting to shoot.
 
-               setTargetPosition(DRIVE_FORWARD,3275); //Drive forward using encoder counts.
+           //    setTargetPosition(DRIVE_FORWARD,3275); //Drive forward using encoder counts.
+               setTargetPosition(DRIVE_FORWARD,1638); //Drive forward using encoder counts.
                runToPosition(0.856);
 
                   //Shoot the rings one by one.
@@ -248,8 +249,8 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
                 hardwarePushBot.shootingWheel.setPower(0); //turn off the shooting wheel*/
 
                runWithoutEncoder();
-               drivewWithFeedback_FBM(0, 0.5, 1.15); //Strafe Right.
-               drivewWithFeedback_FBM(-0.5, 0, 0.15);  // Adjust to go forward to get ready for shooting
+               drivewWithFeedback_FBM(0, 0.5, 0.58); //Strafe Right.
+               drivewWithFeedback_FBM(-0.5, 0, 0.08);  // Adjust to go forward to get ready for shooting
 
                stopResetEncoder();
 
@@ -263,8 +264,8 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
                setTargetPosition(WOBBLE_ARM_UP, 3100);  // Move wobble goal arm up using encoder counts.
                runToPositionForWobbleArm(1.0);
 
-                setTargetPosition(TURN_LEFT,2290);  // Turn left 45 degrees to get second wobble goal using enocder.
-                runToPosition(1.0);
+               setTargetPosition(TURN_LEFT,1145);  // Turn left 45 degrees to get second wobble goal using enocder.
+                runToPosition( 1.0);
 
                 setTargetPosition(WOBBLE_ARM_DOWN, 3100); // Move the wobble arm down using encoder.
                 runToPositionForWobbleArm(0.75);
@@ -272,7 +273,7 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
                 hardwarePushBot.wobbleGoalFinger.setPosition(0);  // Open the finger to get ready to pick up.
                 hardwarePushBot.wobbleGoalFinger2.setPosition(0);
 
-                setTargetPosition(DRIVE_FORWARD,2300);  // Drive forward towards second wobble goal using encoder.
+                setTargetPosition(DRIVE_FORWARD,1150);  // Drive forward towards second wobble goal using encoder.
                 runToPosition(1.0);
 
                 hardwarePushBot.wobbleGoalFinger.setPosition(1.0);  // Close the finger.
@@ -282,10 +283,10 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
                 setTargetPosition(WOBBLE_ARM_UP, 1000);  // Move the warm slightly up to avoid wobble arm damage.
                 runToPositionForWobbleArm(1.0);
 
-                setTargetPosition(DRIVE_BACK,2050);  // Drive backwards towards target zone.
+                setTargetPosition(DRIVE_BACK,1025);  // Drive backwards towards target zone.
                 runToPosition(1.0);
 
-                setTargetPosition(TURN_RIGHT,2000);  // Turn back 45 degrees to go to target zone
+                setTargetPosition(TURN_RIGHT,1000);  // Turn back 45 degrees to go to target zone
                 runToPosition(1.0);
 
                 setTargetPosition(WOBBLE_ARM_DOWN, 1000);  // Move the warm slightly up to avoid wobble arm damage.
@@ -299,11 +300,11 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
 
                 runWithoutEncoder();
 
-                drivewWithFeedback_FBM(0.5, 0, 0.25); //Slightly move forward to adjust and get ready fo
+                drivewWithFeedback_FBM(0.5, 0, 0.13); //Slightly move forward to adjust and get ready fo
 
-                drivewWithFeedback_FBM(0, -0.5, 1.5); // Strafe left based on time.
+                drivewWithFeedback_FBM(0, -0.5, 0.75); // Strafe left based on time.
 
-                drivewWithFeedback_FBM(-0.5, 0, 1.0); //Slightly move forward to adjust and get ready fo
+                drivewWithFeedback_FBM(-0.5, 0, 0.5); //Slightly move forward to adjust and get ready fo
 
                 break;
             case 2 : // Target zone B
