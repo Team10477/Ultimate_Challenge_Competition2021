@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -32,8 +33,9 @@ public class HardwarePushBot {
     Intake, Shooting, and Wobble Goal DC Motors
  */
     public DcMotor ringIntake = null;
-    public DcMotor shootingWheel = null;
+   // public DcMotor shootingWheel = null;
     public DcMotor wobbleGoalArm = null;
+    public DcMotorEx shootingWheel = null;
 
     /**
      * Two color Sensors
@@ -102,7 +104,7 @@ public class HardwarePushBot {
     }
 
     public void mapShootingWheel(HardwareMap hwMap){
-        shootingWheel = hwMap.get(DcMotor.class, "shooting_wheel");
+        shootingWheel = hwMap.get(DcMotorEx.class, "shooting_wheel");
         shootingTrigger = hwMap.get(Servo.class, "shooting_trigger");
     }
 
@@ -139,9 +141,9 @@ public class HardwarePushBot {
 
     public void setWheelDirection() {
         leftFrontWheel.setDirection(DcMotor.Direction.FORWARD);
-        leftBackWheel.setDirection(DcMotor.Direction.REVERSE);
+        leftBackWheel.setDirection(DcMotor.Direction.FORWARD);
         rightFrontWheel.setDirection(DcMotor.Direction.REVERSE);
-        rightBackWheel.setDirection(DcMotor.Direction.FORWARD);
+        rightBackWheel.setDirection(DcMotor.Direction.REVERSE);
     }
 
 
