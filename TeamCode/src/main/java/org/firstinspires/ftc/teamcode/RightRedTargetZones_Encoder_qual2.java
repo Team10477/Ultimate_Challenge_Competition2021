@@ -62,7 +62,7 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
     static int WOBBLE_ARM_UP = 5;
     static int TURN_RIGHT = 6;
     static int TURN_LEFT = 7;
-    static double SHOOTING_WHEEL_VELOCITY = -1740;
+    static double SHOOTING_WHEEL_VELOCITY = -1760;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -72,7 +72,6 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
         int counter = 1;
        while (opModeIsActive() && counter == 1) {
             identifyRings();
-            targetZone=1;
             goToTargetZones();
             deactivateTfod();
             counter++;
@@ -93,17 +92,15 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
         hardwarePushBot.rightColorSensor.enableLed(true);
 
         // Note changes for Strafer Chassis below
-        hardwarePushBot.leftFrontWheel.setDirection(DcMotor.Direction.FORWARD);
-        hardwarePushBot.leftBackWheel.setDirection(DcMotor.Direction.REVERSE);
-        hardwarePushBot.rightFrontWheel.setDirection(DcMotor.Direction.REVERSE);
-        hardwarePushBot.rightBackWheel.setDirection(DcMotor.Direction.FORWARD);
+        hardwarePushBot.setWheelDirection();
+
         hardwarePushBot.wobbleGoalFinger.setPosition(1);
         hardwarePushBot.wobbleGoalFinger2.setPosition(1);
         hardwarePushBot.shootingTrigger.setPosition(0);
         initVuforia();
         initTfod();
         activateTfod();
-       // sleep(6500);
+        sleep(6500);
 
         telemetry.addData("Initialization complete", "Done");
         telemetry.update();
@@ -236,35 +233,27 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
             case 1: //Target zone A
                stopResetEncoder();
 
-             /*  setTargetPosition(DRIVE_FORWARD,3250); //Drive forward using encoder counts.
-               runToPosition(0.856); */
+               startShootingWheelUsingEncoder();  //Adjust shooting wheel based on battery voltage before starting to shoot.
 
-                startShootingWheelUsingEncoder();  //Adjust shooting wheel based on battery voltage before starting to shoot.
-                sleep(2500);
-                telemetry.addData("velocity", hardwarePushBot.shootingWheel.getVelocity());
-                telemetry.update();
-                double[] velocities = new double[3];
-                //Shoot the rings one by one.
+               setTargetPosition(DRIVE_FORWARD,3275); //Drive forward using encoder counts.
+               runToPosition(0.856);
+
+                  //Shoot the rings one by one.
                for (int i=0; i < 3 && opModeIsActive(); i++) {
-                    velocities[i] = hardwarePushBot.shootingWheel.getVelocity();
                     hardwarePushBot.shootingTrigger.setPosition(1);
-                    sleep(500);
-                //    telemetry.addData("current Position ", hardwarePushBot.shootingWheel.getCurrentPosition());
-                 //   telemetry.update();
+                    sleep(550);
                     hardwarePushBot.shootingTrigger.setPosition(0);
                     sleep(500);
                 }
                 hardwarePushBot.shootingWheel.setPower(0); //turn off the shooting wheel*/
 
-                for(int i=0; i<3; i++) {
-                    telemetry.addData("velocities", velocities[i]);
+               runWithoutEncoder();
+               drivewWithFeedback_FBM(0, 0.5, 1.15); //Strafe Right.
+               drivewWithFeedback_FBM(-0.5, 0, 0.15);  // Adjust to go forward to get ready for shooting
 
-                }
-                telemetry.update();
-              /* setTargetPosition(STRAFE_RIGHT,1250); //Strafe right
-               runToPosition(0.85);*/
+               stopResetEncoder();
 
-              /* setTargetPosition(WOBBLE_ARM_DOWN, 3100);  //Move Wobblearm down using encoder counts.
+               setTargetPosition(WOBBLE_ARM_DOWN, 3100);  //Move Wobblearm down using encoder counts.
                runToPositionForWobbleArm(1.0);
 
                hardwarePushBot.wobbleGoalFinger.setPosition(0);  // Open the finger to release the wobble goal.
@@ -274,7 +263,7 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
                setTargetPosition(WOBBLE_ARM_UP, 3100);  // Move wobble goal arm up using encoder counts.
                runToPositionForWobbleArm(1.0);
 
-                setTargetPosition(TURN_LEFT,2100);  // Turn left 45 degrees to get second wobble goal using enocder.
+                setTargetPosition(TURN_LEFT,2290);  // Turn left 45 degrees to get second wobble goal using enocder.
                 runToPosition(1.0);
 
                 setTargetPosition(WOBBLE_ARM_DOWN, 3100); // Move the wobble arm down using encoder.
@@ -283,7 +272,7 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
                 hardwarePushBot.wobbleGoalFinger.setPosition(0);  // Open the finger to get ready to pick up.
                 hardwarePushBot.wobbleGoalFinger2.setPosition(0);
 
-                setTargetPosition(DRIVE_FORWARD,2100);  // Drive forward towards second wobble goal using encoder.
+                setTargetPosition(DRIVE_FORWARD,2300);  // Drive forward towards second wobble goal using encoder.
                 runToPosition(1.0);
 
                 hardwarePushBot.wobbleGoalFinger.setPosition(1.0);  // Close the finger.
@@ -293,13 +282,10 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
                 setTargetPosition(WOBBLE_ARM_UP, 1000);  // Move the warm slightly up to avoid wobble arm damage.
                 runToPositionForWobbleArm(1.0);
 
-                setTargetPosition(DRIVE_BACK,1900);  // Drive backwards towards target zone.
+                setTargetPosition(DRIVE_BACK,2050);  // Drive backwards towards target zone.
                 runToPosition(1.0);
 
-                setTargetPosition(TURN_RIGHT,1950);  // Turn back 45 degrees to go to target zone
-                runToPosition(1.0);
-
-                setTargetPosition(DRIVE_FORWARD,50);  // Drive forward
+                setTargetPosition(TURN_RIGHT,2000);  // Turn back 45 degrees to go to target zone
                 runToPosition(1.0);
 
                 setTargetPosition(WOBBLE_ARM_DOWN, 1000);  // Move the warm slightly up to avoid wobble arm damage.
@@ -313,21 +299,42 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
 
                 runWithoutEncoder();
 
-                drivewWithFeedback_FBM(0, -0.5, 0.75); // Strafe left based on time.
+                drivewWithFeedback_FBM(0.5, 0, 0.25); //Slightly move forward to adjust and get ready fo
 
-                drivewWithFeedback_FBM(-0.5, 0, 0.25); //Slightly move forward to adjust and get ready fo
-*/
+                drivewWithFeedback_FBM(0, -0.5, 1.5); // Strafe left based on time.
+
+                drivewWithFeedback_FBM(-0.5, 0, 1.0); //Slightly move forward to adjust and get ready fo
+
                 break;
             case 2 : // Target zone B
 
-                stopResetEncoder(); // Strafe Right.
-                setTargetPosition(STRAFE_RIGHT,1325);
+                stopResetEncoder();
+
+                setTargetPosition(STRAFE_RIGHT,1325);  // Strafe right
                 runToPosition(1);
 
-                setTargetPosition(DRIVE_FORWARD,5000);  // Drive forward.
+                startShootingWheelUsingEncoder();  //Start shooting wheel using encoder.
+
+                setTargetPosition(DRIVE_FORWARD,3275);  // Drive forward.
                 runToPosition(1);
 
-                setTargetPosition(STRAFE_LEFT,1600); // Strafe Left.
+                setTargetPosition(STRAFE_LEFT,1325); // Strafe Left.
+                runToPosition(0.85);
+
+                //Shoot the rings one by one.
+                for (int i=0; i < 3 && opModeIsActive(); i++) {
+                    hardwarePushBot.shootingTrigger.setPosition(1);
+                    sleep(550);
+                    hardwarePushBot.shootingTrigger.setPosition(0);
+                    sleep(500);
+                }
+                hardwarePushBot.shootingWheel.setPower(0); //turn off the shooting wheel*/
+
+                runWithoutEncoder();
+                drivewWithFeedback_FBM(0, -0.5, 0.40); //Strafe Left.
+
+                stopResetEncoder();
+                setTargetPosition(DRIVE_FORWARD,1700);  // Drive forward.
                 runToPosition(1);
 
                 setTargetPosition(WOBBLE_ARM_DOWN, 3100);  //Move wobble arm down to place thw wobble goal.
@@ -340,31 +347,45 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
                 setTargetPosition(WOBBLE_ARM_UP, 3100);  //Move the wobble arm up.
                 runToPositionForWobbleArm(0.75);
 
-                setTargetPosition(STRAFE_RIGHT,1600);  //Strafe right
-                runToPosition(1);
-
                 runWithoutEncoder();
+                drivewWithFeedback_FBM(0.5, 0, 0.55);  // Adjust to go backward
+                drivewWithFeedback_FBM(0, -0.5, 0.40); //Strafe Left to get ready for next
 
-                drivewWithFeedback_FBM_Colors(0.5, 0, 3.0, "RED"); // Go back until red color.
+                stopResetEncoder();
+                setTargetPosition(TURN_LEFT,2700);  // Turn around 180 degrees to get second wobble goal using enocder.
+                runToPosition(1.0);
 
-                drivewWithFeedback_FBM_Colors(0.5, 0, 2.0, "RED");  // Go back until red color.
+                setTargetPosition(WOBBLE_ARM_DOWN, 3100);  //Move wobble arm down to place thw wobble goal.
+                runToPositionForWobbleArm(0.75);
 
-                startShootingWheelByVoltage(); //Start shooting wheel based on battery voltage sensor.
+                hardwarePushBot.wobbleGoalFinger.setPosition(0);  //Release the finger.
+                hardwarePushBot.wobbleGoalFinger2.setPosition(0);
 
-                drivewWithFeedback_FBM(0, -0.5, 1.1);  //Strafe left
-                drivewWithFeedback_FBM(-0.5, 0, 0.15);  // Adjust to go forward to get ready for shooting
+                setTargetPosition(DRIVE_FORWARD,2600);  // Turn around 180 degrees to get second wobble goal using enocder.
+                runToPosition(1.0);
 
-                startShootingWheelByVoltage(); //Start shooting wheel based on battery voltage sensor.
+                hardwarePushBot.wobbleGoalFinger.setPosition(1);  //Close the finger.
+                hardwarePushBot.wobbleGoalFinger2.setPosition(1);
                 sleep(100);
 
-                for (int i=0; i < 3 && opModeIsActive(); i++) {  //Start shooting rings
-                    hardwarePushBot.shootingTrigger.setPosition(1);
-                    sleep(500);
-                    hardwarePushBot.shootingTrigger.setPosition(0);
-                    sleep(500);
-                }
+                setTargetPosition(WOBBLE_ARM_UP, 1000);  // Move the warm slightly up to avoid wobble arm damage.
+                runToPositionForWobbleArm(1.0);
 
-                drivewWithFeedback_FBM(-0.5, 0, 0.45);  // Park launch line.
+                setTargetPosition(DRIVE_BACK,2575);  // Turn around 180 degrees to get second wobble goal using enocder.
+                runToPosition(1.0);
+
+                setTargetPosition(TURN_LEFT,2700);  // Turn around 180 degrees to get second wobble goal using enocder.
+                runToPosition(1.0);
+
+                setTargetPosition(WOBBLE_ARM_DOWN, 1000);  // Move the warm slightly up to avoid wobble arm damage.
+                runToPositionForWobbleArm(1.0);
+
+                hardwarePushBot.wobbleGoalFinger.setPosition(0);  //Release the finger.
+                hardwarePushBot.wobbleGoalFinger2.setPosition(0);
+
+                setTargetPosition(WOBBLE_ARM_UP, 1000);  // Move the warm slightly up to avoid wobble arm damage.
+                runToPositionForWobbleArm(1.0);
+
                 break;
             case 3:  // Target zone C
 
@@ -372,7 +393,27 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
                 setTargetPosition(STRAFE_RIGHT,1325);
                 runToPosition(1);
 
-                setTargetPosition(DRIVE_FORWARD,6550); //Go forward to target zone c.
+                startShootingWheelUsingEncoder();  //Start shooting wheel using encoder.
+
+                setTargetPosition(DRIVE_FORWARD,3275);  // Drive forward.
+                runToPosition(1);
+
+                setTargetPosition(STRAFE_LEFT,1325); // Strafe Left.
+                runToPosition(0.85);
+
+                //Shoot the rings one by one.
+                for (int i=0; i < 3 && opModeIsActive(); i++) {
+                    hardwarePushBot.shootingTrigger.setPosition(1);
+                    sleep(550);
+                    hardwarePushBot.shootingTrigger.setPosition(0);
+                    sleep(500);
+                }
+                hardwarePushBot.shootingWheel.setPower(0); //turn off the shooting wheel*/
+
+                setTargetPosition(TURN_RIGHT,1050);  // Turn around 15 degrees using enocder.
+                runToPosition(1.0);
+
+                setTargetPosition(DRIVE_FORWARD,1900);  // Drive forward.
                 runToPosition(1);
 
                 setTargetPosition(WOBBLE_ARM_DOWN, 3100); //Move wobble arm down.
@@ -385,7 +426,7 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
                 setTargetPosition(WOBBLE_ARM_UP, 3100); //Wobble arm up.
                 runToPositionForWobbleArm(0.75);
 
-                setTargetPosition(DRIVE_BACK,2800);  //Drive back.
+             /*   setTargetPosition(DRIVE_BACK,2800);  //Drive back.
                 runToPosition(1);
 
                 startShootingWheelByVoltage(); //Turn on the shooting wheel
@@ -409,7 +450,7 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
                 }
 
                 drivewWithFeedback_FBM(-0.5, 0, 0.45); //Go forward to park in the launch line
-
+*/
                 break;
         }
     }
