@@ -29,26 +29,15 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Activity;
 import android.graphics.Color;
-import android.view.View;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-import java.util.Locale;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -274,6 +263,7 @@ public class Teleop_Basic_Iterative extends OpMode
         // convert the RGB values to HSV values.
         // multiply by the SCALE_FACTOR.
         // then cast it back to int (SCALE_FACTOR is a double)
+
         Color.RGBToHSV((int) (hardwarePushBot.rightColorSensor.red() * SCALE_FACTOR),
                 (int) (hardwarePushBot.rightColorSensor.green() * SCALE_FACTOR),
                 (int) (hardwarePushBot.rightColorSensor.blue() * SCALE_FACTOR),
@@ -332,9 +322,9 @@ public class Teleop_Basic_Iterative extends OpMode
         //hardwarePushBot.setWheelDirection();
         // Note changes for Strafer Chassis below
         hardwarePushBot.leftFrontWheel.setDirection(DcMotor.Direction.FORWARD);
-        hardwarePushBot.leftBackWheel.setDirection(DcMotor.Direction.REVERSE);
+        hardwarePushBot.leftBackWheel.setDirection(DcMotor.Direction.FORWARD);
         hardwarePushBot.rightFrontWheel.setDirection(DcMotor.Direction.REVERSE);
-        hardwarePushBot.rightBackWheel.setDirection(DcMotor.Direction.FORWARD);
+        hardwarePushBot.rightBackWheel.setDirection(DcMotor.Direction.REVERSE);
     }
 
     public double getVoltage() {

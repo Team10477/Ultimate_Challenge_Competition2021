@@ -164,25 +164,25 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
             hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() - position);
             hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() - position);
         } else if (action == 8) { //diagonal right front
-            hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() + position);
-            hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() + 0);
-            hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() +0 );
-            hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() + position);
-        }else if (action == 9) { //diagonal left front
-            hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() + 0);
-            hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() + position);
-            hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() + position);
-            hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() + 0);
-        }else if (action == 10) { //diagonal left back
             hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() - position);
-            hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() +0);
-            hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() +0);
+            //hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() + 0);
+            //hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() +0 );
             hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() - position);
-        }else if (action == 11) { //diagonal right back
-            hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() + 0);
+        }else if (action == 9) { //diagonal left front
+            //hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() + 0);
             hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() - position);
             hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() - position);
-            hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() + 0);
+            //hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() + 0);
+        }else if (action == 10) { //diagonal left back
+            hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() + position);
+            //hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() +0);
+            //hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() +0);
+            hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() + position);
+        }else if (action == 11) { //diagonal right back
+            //hardwarePushBot.leftFrontWheel.setTargetPosition(hardwarePushBot.leftFrontWheel.getCurrentPosition() + 0);
+            hardwarePushBot.leftBackWheel.setTargetPosition(hardwarePushBot.leftBackWheel.getCurrentPosition() + position);
+            hardwarePushBot.rightFrontWheel.setTargetPosition(hardwarePushBot.rightFrontWheel.getCurrentPosition() + position);
+            //hardwarePushBot.rightBackWheel.setTargetPosition(hardwarePushBot.rightBackWheel.getCurrentPosition() + 0);
         }
 
     }
@@ -195,6 +195,27 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
 
     }
 
+    public void runToPositionAll(double powerLF, double powerRF, double powerLR, double powerRR) {
+        runToPositionMode();
+        // Addition to set the end of encoder feedback to float
+
+        hardwarePushBot.leftFrontWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hardwarePushBot.rightFrontWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hardwarePushBot.leftBackWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hardwarePushBot.rightBackWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        hardwarePushBot.setWheelPower(powerLF, powerRF, powerLR, powerRR);
+
+        while (opModeIsActive() && (hardwarePushBot.leftFrontWheel.isBusy() &&
+               hardwarePushBot.rightFrontWheel.isBusy() && hardwarePushBot.leftBackWheel.isBusy() &&
+                hardwarePushBot.rightBackWheel.isBusy()
+        )) {
+            telemetry.addData("Current position right front", hardwarePushBot.rightFrontWheel.getCurrentPosition());
+            telemetry.update();
+        }
+       hardwarePushBot.setWheelPower(0.0, 0.0, 0.0, 0.0);
+
+    }
     public void runToPosition(double power) {
         runToPositionMode();
         // Addition to set the end of encoder feedback to float
@@ -207,14 +228,58 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
         hardwarePushBot.setWheelPower(power, power, power, power);
 
         while (opModeIsActive() && (hardwarePushBot.leftFrontWheel.isBusy() &&
-               hardwarePushBot.rightFrontWheel.isBusy() && hardwarePushBot.leftBackWheel.isBusy() &&
+                hardwarePushBot.rightFrontWheel.isBusy() && hardwarePushBot.leftBackWheel.isBusy() &&
                 hardwarePushBot.rightBackWheel.isBusy()
         )) {
             telemetry.addData("Current position right front", hardwarePushBot.rightFrontWheel.getCurrentPosition());
             telemetry.update();
         }
-       hardwarePushBot.setWheelPower(0.0, 0.0, 0.0, 0.0);
+        hardwarePushBot.setWheelPower(0.0, 0.0, 0.0, 0.0);
 
+    }
+    public void runToPositionDiag_RF_LB(){
+        hardwarePushBot.leftFrontWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hardwarePushBot.rightFrontWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hardwarePushBot.leftBackWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hardwarePushBot.rightBackWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        hardwarePushBot.leftFrontWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        hardwarePushBot.leftBackWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        hardwarePushBot.rightFrontWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        hardwarePushBot.rightBackWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        //runToPositionAll(1, 0,0,1);
+        hardwarePushBot.setWheelPower(1,0.1,0.1,1);
+
+        while (opModeIsActive() && (hardwarePushBot.leftFrontWheel.isBusy() &&
+                hardwarePushBot.rightBackWheel.isBusy()
+        )) {
+            telemetry.addData("Current position right front", hardwarePushBot.leftFrontWheel.getCurrentPosition());
+            telemetry.update();
+        }
+        hardwarePushBot.setWheelPower(0.0, 0.0, 0.0, 0.0);
+    }
+    public void runToPositionDiag_LF_RB(){
+        hardwarePushBot.leftFrontWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hardwarePushBot.rightFrontWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hardwarePushBot.leftBackWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hardwarePushBot.rightBackWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        hardwarePushBot.leftFrontWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        hardwarePushBot.leftBackWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        hardwarePushBot.rightFrontWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        hardwarePushBot.rightBackWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        //runToPositionAll(1, 0,0,1);
+        hardwarePushBot.setWheelPower(1,0.1,0.1,1);
+
+        while (opModeIsActive() && (hardwarePushBot.leftBackWheel.isBusy() &&
+                hardwarePushBot.rightFrontWheel.isBusy()
+        )) {
+            telemetry.addData("Current position right front", hardwarePushBot.rightFrontWheel.getCurrentPosition());
+            telemetry.update();
+        }
+        hardwarePushBot.setWheelPower(0.0, 0.0, 0.0, 0.0);
     }
 
     public void runToPosition_FBM(double drivePower, double strafePower) {
@@ -263,7 +328,8 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
     }
 
     public void goToTargetZones() {
-        switch (targetZone) {
+       switch (targetZone) {
+
             case 1: //Target zone A
                /*stopResetEncoder(); //Strafe Right using encoder counts.
                setTargetPosition(STRAFE_RIGHT,1320);
@@ -271,10 +337,20 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
               runToPosition(1);
               //runToPosition_FBM(1,0);*/
                 stopResetEncoder(); //
+                setTargetPosition(DIAG_RIGHT_FRONT,2000);
+                runToPositionDiag_RF_LB();
 
-                setTargetPosition(DIAG_RIGHT_FRONT,1320);
-                runToPosition(1);
+                setTargetPosition(DIAG_LEFT_FRONT,2000);
+                runToPositionDiag_LF_RB();
 
+                setTargetPosition(DIAG_RIGHT_BACK,2000);
+                runToPositionDiag_LF_RB();
+
+                setTargetPosition(DIAG_LEFT_BACK,2000);
+                runToPositionDiag_RF_LB();
+
+            break;
+/*
                 setTargetPosition(DIAG_LEFT_FRONT,1320);
                 runToPosition(1);
 
@@ -284,8 +360,7 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
                 setTargetPosition(DIAG_LEFT_FRONT,1320);
                 runToPosition(1);
 
-                break;
-/*
+
                setTargetPosition(DRIVE_FORWARD,3800); //Drive forward using encoder counts.
              runToPosition(1);
              //runToPosition_FBM(1,0);
