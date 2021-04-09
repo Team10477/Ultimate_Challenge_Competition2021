@@ -90,10 +90,8 @@ public class RightRedTargetZones_Encoder_qual1 extends LinearOpMode {
         hardwarePushBot.rightColorSensor.enableLed(true);
 
         // Note changes for Strafer Chassis below
-        hardwarePushBot.leftFrontWheel.setDirection(DcMotor.Direction.FORWARD);
-        hardwarePushBot.leftBackWheel.setDirection(DcMotor.Direction.REVERSE);
-        hardwarePushBot.rightFrontWheel.setDirection(DcMotor.Direction.REVERSE);
-        hardwarePushBot.rightBackWheel.setDirection(DcMotor.Direction.FORWARD);
+        hardwarePushBot.setWheelDirection();
+
         hardwarePushBot.wobbleGoalFinger.setPosition(1);
         hardwarePushBot.wobbleGoalFinger2.setPosition(1);
         hardwarePushBot.shootingTrigger.setPosition(0);
