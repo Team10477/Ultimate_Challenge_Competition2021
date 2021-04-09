@@ -57,6 +57,24 @@ import com.qualcomm.robotcore.util.Range;
 //@Disabled
 public class Teleop_Basic_Iterative extends OpMode
 {
+
+     // Setup a variable for each drive wheel to save power level for telemetry
+    double leftFrontPower;
+    double rightFrontPower;
+    double leftRearPower;
+    double rightRearPower;
+    double wobbleArmPower;
+    double wobbleFingerPower;
+    double wobbleFinger2Power;
+    double wobbleArmPosition;
+    double wobbleHandPower;
+    double hue, saturation, value;
+    double lightIntensity;
+    double wobbleGoalupdown=0;
+    double battVoltage = 0;
+    static double SHOOTING_WHEEL_VELOCITY = -1760;
+    static double SHOOTING_WHEEL_VELOCITY_POWERSHOT = -1700;
+
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -110,7 +128,7 @@ public class Teleop_Basic_Iterative extends OpMode
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
-        getVoltage();
+        battVoltage= getVoltage();
         telemetry.update();
     }
 
@@ -136,7 +154,7 @@ public class Teleop_Basic_Iterative extends OpMode
 
 
     public void loop() {
-        // Setup a variable for each drive wheel to save power level for telemetry
+     /*   // Setup a variable for each drive wheel to save power level for telemetry
         double leftFrontPower;
         double rightFrontPower;
         double leftRearPower;
@@ -148,8 +166,7 @@ public class Teleop_Basic_Iterative extends OpMode
         double wobbleHandPower;
         double hue, saturation, value;
         double lightIntensity;
-        double wobbleGoalupdown=0;
-        double battVoltage = 0;
+        double wobbleGoalupdown=0;*/
 
         // Choose to drive using either Tank Mode, or POV Mode
         // Comment out the method that's not used.  The default below is POV.
@@ -237,10 +254,11 @@ public class Teleop_Basic_Iterative extends OpMode
             hardwarePushBot.shootingWheel.setPower(0.0);
         }
         if (gamepad2.b){
-            hardwarePushBot.shootingWheel.setPower(0.748-(battVoltage-12)*(0.76-0.62)/(1.95));
+         //   hardwarePushBot.shootingWheel.setPower(0.748-(battVoltage-12)*(0.748-0.62)/(1.95));
+            startShootingWheelUsingEncoder(SHOOTING_WHEEL_VELOCITY);
         }
         if (gamepad2.y){
-            hardwarePushBot.shootingWheel.setPower(0.7);
+           startShootingWheelUsingEncoder(SHOOTING_WHEEL_VELOCITY_POWERSHOT);
         }
 
 
@@ -343,6 +361,13 @@ public class Teleop_Basic_Iterative extends OpMode
         telemetry.update();
        return result;
 
+
+    }
+
+    public void startShootingWheelUsingEncoder(double shootingVelocity) {
+        hardwarePushBot.shootingWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        hardwarePushBot.shootingWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        hardwarePushBot.shootingWheel.setVelocity(shootingVelocity);
 
     }
 }
