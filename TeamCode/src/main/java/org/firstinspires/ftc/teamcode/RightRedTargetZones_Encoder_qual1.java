@@ -17,8 +17,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-@Autonomous(name="Encoder-Detect Red Right Target Zones")
-public class RightRedTargetZones_Encoder_detect extends LinearOpMode {
+@Autonomous(name="Encoder-qual1-Detect Red Right Target Zones")
+public class RightRedTargetZones_Encoder_qual1 extends LinearOpMode {
 
     private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Quad";
@@ -90,10 +90,8 @@ public class RightRedTargetZones_Encoder_detect extends LinearOpMode {
         hardwarePushBot.rightColorSensor.enableLed(true);
 
         // Note changes for Strafer Chassis below
-        hardwarePushBot.leftFrontWheel.setDirection(DcMotor.Direction.FORWARD);
-        hardwarePushBot.leftBackWheel.setDirection(DcMotor.Direction.REVERSE);
-        hardwarePushBot.rightFrontWheel.setDirection(DcMotor.Direction.REVERSE);
-        hardwarePushBot.rightBackWheel.setDirection(DcMotor.Direction.FORWARD);
+        hardwarePushBot.setWheelDirection();
+
         hardwarePushBot.wobbleGoalFinger.setPosition(1);
         hardwarePushBot.wobbleGoalFinger2.setPosition(1);
         hardwarePushBot.shootingTrigger.setPosition(0);
