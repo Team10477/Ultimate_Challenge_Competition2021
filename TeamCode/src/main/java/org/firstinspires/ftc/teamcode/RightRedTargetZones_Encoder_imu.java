@@ -95,9 +95,9 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
 
         // Note changes for Strafer Chassis below
         hardwarePushBot.leftFrontWheel.setDirection(DcMotor.Direction.FORWARD);
-        hardwarePushBot.leftBackWheel.setDirection(DcMotor.Direction.REVERSE);
+        hardwarePushBot.leftBackWheel.setDirection(DcMotor.Direction.FORWARD);
         hardwarePushBot.rightFrontWheel.setDirection(DcMotor.Direction.REVERSE);
-        hardwarePushBot.rightBackWheel.setDirection(DcMotor.Direction.FORWARD);
+        hardwarePushBot.rightBackWheel.setDirection(DcMotor.Direction.REVERSE);
         hardwarePushBot.wobbleGoalFinger.setPosition(1);
         hardwarePushBot.wobbleGoalFinger2.setPosition(1);
         hardwarePushBot.shootingTrigger.setPosition(0);
@@ -237,7 +237,7 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
         hardwarePushBot.setWheelPower(0.0, 0.0, 0.0, 0.0);
 
     }
-    public void runToPositionDiag_RF_LB(){
+    public void runToPositionDiag_LF_RB(){
         hardwarePushBot.leftFrontWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         hardwarePushBot.rightFrontWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         hardwarePushBot.leftBackWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -249,7 +249,7 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
         hardwarePushBot.rightBackWheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         //runToPositionAll(1, 0,0,1);
-        hardwarePushBot.setWheelPower(1,0.1,0.1,1);
+        hardwarePushBot.setWheelPower(1,0.0,0.0,1);
 
         while (opModeIsActive() && (hardwarePushBot.leftFrontWheel.isBusy() &&
                 hardwarePushBot.rightBackWheel.isBusy()
@@ -259,7 +259,7 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
         }
         hardwarePushBot.setWheelPower(0.0, 0.0, 0.0, 0.0);
     }
-    public void runToPositionDiag_LF_RB(){
+    public void runToPositionDiag_RF_LB(){
         hardwarePushBot.leftFrontWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         hardwarePushBot.rightFrontWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         hardwarePushBot.leftBackWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -271,7 +271,7 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
         hardwarePushBot.rightBackWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         //runToPositionAll(1, 0,0,1);
-        hardwarePushBot.setWheelPower(1,0.1,0.1,1);
+        hardwarePushBot.setWheelPower(0,1,1,0);
 
         while (opModeIsActive() && (hardwarePushBot.leftBackWheel.isBusy() &&
                 hardwarePushBot.rightFrontWheel.isBusy()
@@ -328,7 +328,7 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
     }
 
     public void goToTargetZones() {
-       switch (targetZone) {
+       switch (1) {
 
             case 1: //Target zone A
                /*stopResetEncoder(); //Strafe Right using encoder counts.
@@ -337,17 +337,17 @@ public class RightRedTargetZones_Encoder_imu extends LinearOpMode {
               runToPosition(1);
               //runToPosition_FBM(1,0);*/
                 stopResetEncoder(); //
-                setTargetPosition(DIAG_RIGHT_FRONT,2000);
+               setTargetPosition(DIAG_RIGHT_FRONT,1500);
+               runToPositionDiag_LF_RB();
+
+                setTargetPosition(DIAG_LEFT_FRONT,1500);
                 runToPositionDiag_RF_LB();
 
-                setTargetPosition(DIAG_LEFT_FRONT,2000);
-                runToPositionDiag_LF_RB();
-
-                setTargetPosition(DIAG_RIGHT_BACK,2000);
-                runToPositionDiag_LF_RB();
-
-                setTargetPosition(DIAG_LEFT_BACK,2000);
+                setTargetPosition(DIAG_RIGHT_BACK,1500);
                 runToPositionDiag_RF_LB();
+
+                setTargetPosition(DIAG_LEFT_BACK,1500);
+                runToPositionDiag_LF_RB();
 
             break;
 /*
