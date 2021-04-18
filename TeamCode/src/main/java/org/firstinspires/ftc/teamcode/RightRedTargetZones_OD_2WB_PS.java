@@ -87,6 +87,7 @@ public class RightRedTargetZones_OD_2WB_PS extends LinearOpMode {
         hardwarePushBot.mapRingIntake(hardwareMap);
         hardwarePushBot.mapWobbleArm(hardwareMap);
         hardwarePushBot.mapShootingWheel(hardwareMap);
+        hardwarePushBot.mapTouchSensor(hardwareMap);
 
         hardwarePushBot.leftColorSensor.enableLed(true);
         hardwarePushBot.rightColorSensor.enableLed(true);
@@ -196,7 +197,21 @@ public class RightRedTargetZones_OD_2WB_PS extends LinearOpMode {
 
         hardwarePushBot.wobbleGoalArm.setPower(power);
 
-        while (opModeIsActive() && hardwarePushBot.wobbleGoalArm.isBusy()) {
+        while (opModeIsActive() && hardwarePushBot.wobbleGoalArm.isBusy() && hardwarePushBot.touchSensorWaFront.getState()) {
+            telemetry.addData("Current position wobble arm", hardwarePushBot.wobbleGoalArm.getCurrentPosition());
+            telemetry.update();
+        }
+
+        hardwarePushBot.wobbleGoalArm.setPower(0);
+
+    }
+
+  public void runToPositionForWobbleArmBack(double power) {
+        hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        hardwarePushBot.wobbleGoalArm.setPower(power);
+
+        while (opModeIsActive() && hardwarePushBot.wobbleGoalArm.isBusy() && hardwarePushBot.touchSensorWaBack.getState()) {
             telemetry.addData("Current position wobble arm", hardwarePushBot.wobbleGoalArm.getCurrentPosition());
             telemetry.update();
         }
@@ -273,7 +288,7 @@ public class RightRedTargetZones_OD_2WB_PS extends LinearOpMode {
                 setTargetPosition(DRIVE_FORWARD,985);
                 runToPosition(0.8);
 
-                sleep(100);
+                //sleep(300);
 
                 //Close Claw
                 hardwarePushBot.wobbleGoalFinger.setPosition(1);
@@ -281,132 +296,72 @@ public class RightRedTargetZones_OD_2WB_PS extends LinearOpMode {
                 sleep(500);
 
                 //Wobble Goal Arm Up slightly
-                setTargetPosition(WOBBLE_ARM_UP, 1200);
-                runToPositionForWobbleArm(1.0);
+                setTargetPosition(WOBBLE_ARM_UP, 2000);
+                runToPositionForWobbleArmBack(1.0);
 
                 //Drive Back
-                setTargetPosition(DRIVE_BACK,660);
+                setTargetPosition(DRIVE_BACK,670);
                 runToPosition(0.8);
 
                 //Turn Left
-                setTargetPosition(TURN_RIGHT,1180);
+                setTargetPosition(TURN_RIGHT,1160);
                 runToPosition(0.8);
 
                 //Drive Forward
-                setTargetPosition(DRIVE_FORWARD,150);
+                setTargetPosition(DRIVE_FORWARD,300);
                 runToPosition(0.8);
+
+                //Wobble Goal Arm Up slightly
+                setTargetPosition(WOBBLE_ARM_DOWN, 1950);
+                runToPositionForWobbleArm(1.0);
 
                 hardwarePushBot.wobbleGoalFinger.setPosition(0);
                 hardwarePushBot.wobbleGoalFinger2.setPosition(0);
                 sleep(500);
 
                 //Drive Back
-                setTargetPosition(DRIVE_BACK,500);
+                setTargetPosition(DRIVE_BACK,250);
                 runToPosition(0.8);
 
                 //Wobble Goal Arm Up slightly
-                setTargetPosition(WOBBLE_ARM_UP, 1200);
-                runToPositionForWobbleArm(1.0);
+                setTargetPosition(WOBBLE_ARM_UP, 2000);
+                runToPositionForWobbleArmBack(1.0);
 
-                /*sleep(10000);
-
-               //Drive Back
-               setTargetPosition(DRIVE_BACK,1390);
-               runToPosition(0.8);
-
-               //Strafe left
-                setTargetPosition(STRAFE_LEFT,200);
-                runToPosition(0.8);
-
-               //Turn left
-               setTargetPosition(TURN_LEFT,675);
-               runToPosition(0.8);
-
-               //Drive Forward
-               setTargetPosition(DRIVE_FORWARD,515);
-               runToPosition(0.35);
-
-                sleep(250);
-
-               //Close Claw
-               hardwarePushBot.wobbleGoalFinger.setPosition(1);
-               hardwarePushBot.wobbleGoalFinger2.setPosition(1);
-               sleep(500);
-
-               //Wobble Goal Arm Up slightly
-               setTargetPosition(WOBBLE_ARM_UP, 2000);
-               runToPositionForWobbleArm(1.0);
-
-               //Turn Right
-               setTargetPosition(TURN_RIGHT,675);
-               runToPosition(0.7);
-
-               //Don't use encoder
-               runWithoutEncoder();
-
-               //Move forward
-                setTargetPosition(DRIVE_FORWARD,1350);
-                runToPosition(0.65);
-
-               //Start encoder
-               stopResetEncoder();
-
-               // Strafe right to target zone A
-               setTargetPosition(STRAFE_RIGHT,460);
-               runToPosition(0.75);
-
-              setTargetPosition(WOBBLE_ARM_DOWN, 2000);  // Move the warm slightly up to avoid wobble arm damage.
-              runToPositionForWobbleArm(1.0);
-
-              hardwarePushBot.wobbleGoalFinger.setPosition(0);  // Release the finger
-              hardwarePushBot.wobbleGoalFinger2.setPosition(0);
-
-              sleep(500);
-
-                //Drive Back
-                setTargetPosition(DRIVE_BACK,300);
-                runToPosition(1);
-
-                setTargetPosition(WOBBLE_ARM_UP, 2800);  // Move the warm slightly up to avoid wobble arm damage.
-                runToPositionForWobbleArm(1.0);
-
-                //Turn on shooting wheel
                 startShootingWheelUsingEncoder(SHOOTING_WHEEL_VELOCITY_POWERSHOT);
 
-                //Drive Left
-                setTargetPosition(STRAFE_LEFT,920);
-                runToPosition(1);
-
-                sleep(500);
-
-                //Shoot
-                hardwarePushBot.shootingTrigger.setPosition(1);
-                sleep(1000);
-                hardwarePushBot.shootingTrigger.setPosition(0);
-
-                //Drive Left
-                setTargetPosition(STRAFE_LEFT,250);
-                runToPosition(0.5);
-
-                sleep(750);
-                hardwarePushBot.shootingTrigger.setPosition(1);
-                sleep(1000);
-                hardwarePushBot.shootingTrigger.setPosition(0);
-
-                //Drive Left
-                setTargetPosition(STRAFE_LEFT,250);
-                runToPosition(0.5);
-
-                sleep(750);
-                hardwarePushBot.shootingTrigger.setPosition(1);
-                sleep(1000);
-                hardwarePushBot.shootingTrigger.setPosition(0);
-
-                //Stop encoder
                 runWithoutEncoder();
 
-                //Move forward
-                drivewWithFeedback_FBM_Colors(-0.6, 0, 0.4,"WHITE");*/
+                //Strafe Left
+                drivewWithFeedback_FBM(0, -0.6, 0.90);
+
+                //drivewWithFeedback_FBM(0.6, 0, 0.25);
+
+                hardwarePushBot.shootingTrigger.setPosition(1);
+                sleep(550);
+                hardwarePushBot.shootingTrigger.setPosition(0);
+                sleep(500);
+
+                stopResetEncoder();
+
+                setTargetPosition(TURN_LEFT, 75);
+                runToPosition(0.6);
+
+                hardwarePushBot.shootingTrigger.setPosition(1);
+                sleep(550);
+                hardwarePushBot.shootingTrigger.setPosition(0);
+                sleep(500);
+
+                setTargetPosition(TURN_LEFT, 75);
+                runToPosition(0.6);
+
+                hardwarePushBot.shootingTrigger.setPosition(1);
+                sleep(550);
+                hardwarePushBot.shootingTrigger.setPosition(0);
+                sleep(500);
+
+                runWithoutEncoder();
+                drivewWithFeedback_FBM(-0.6, 0, 0.45);
+
                 break;
             case 2 : // Target zone B
                 runWithoutEncoder();
