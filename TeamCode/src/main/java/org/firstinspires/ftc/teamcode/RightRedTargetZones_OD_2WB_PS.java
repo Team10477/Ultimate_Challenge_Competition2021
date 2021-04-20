@@ -300,15 +300,15 @@ public class RightRedTargetZones_OD_2WB_PS extends LinearOpMode {
                 runToPositionForWobbleArmBack(1.0);
 
                 //Drive Back
-                setTargetPosition(DRIVE_BACK,670);
+                setTargetPosition(DRIVE_BACK,675);
                 runToPosition(0.8);
 
-                //Turn Left
-                setTargetPosition(TURN_RIGHT,1160);
+                //Turn Right
+                setTargetPosition(TURN_RIGHT,1200);
                 runToPosition(0.8);
 
                 //Drive Forward
-                setTargetPosition(DRIVE_FORWARD,300);
+                setTargetPosition(DRIVE_FORWARD,280);
                 runToPosition(0.8);
 
                 //Wobble Goal Arm Up slightly
@@ -332,7 +332,10 @@ public class RightRedTargetZones_OD_2WB_PS extends LinearOpMode {
                 runWithoutEncoder();
 
                 //Strafe Left
-                drivewWithFeedback_FBM(0, -0.6, 0.90);
+                drivewWithFeedback_FBM(0, -0.2, 0.75);
+
+                setTargetPosition(STRAFE_LEFT,610);
+                runToPosition(0.6);
 
                 //drivewWithFeedback_FBM(0.6, 0, 0.25);
 
@@ -351,7 +354,7 @@ public class RightRedTargetZones_OD_2WB_PS extends LinearOpMode {
                 hardwarePushBot.shootingTrigger.setPosition(0);
                 sleep(500);
 
-                setTargetPosition(TURN_LEFT, 75);
+                setTargetPosition(TURN_LEFT, 45);
                 runToPosition(0.6);
 
                 hardwarePushBot.shootingTrigger.setPosition(1);
