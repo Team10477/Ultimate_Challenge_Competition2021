@@ -499,12 +499,21 @@ public class RightRedTargetZones_Encoder_qual2 extends LinearOpMode {
                 setTargetPosition(TURN_LEFT, 75);
                 runToPosition(0.6);
 
+                setTargetPosition(DRIVE_FORWARD, 100);
+                runToPosition(0.6);
+
                 hardwarePushBot.shootingTrigger.setPosition(1);
                 sleep(550);
                 hardwarePushBot.shootingTrigger.setPosition(0);
                 sleep(500);
 
+                setTargetPosition(DRIVE_BACK, 100);
+                runToPosition(0.6);
+
                 setTargetPosition(TURN_LEFT, 45);
+                runToPosition(0.6);
+
+                setTargetPosition(DRIVE_FORWARD, 100);
                 runToPosition(0.6);
 
                 hardwarePushBot.shootingTrigger.setPosition(1);
