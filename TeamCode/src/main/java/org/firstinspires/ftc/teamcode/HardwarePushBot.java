@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -14,6 +16,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 /**
@@ -58,10 +61,12 @@ public class HardwarePushBot {
     public Servo shootingTrigger = null;
     public Servo wobbleGoalFinger2 = null;
 
-   /* double leftFrontPower = 0;
+    double leftFrontPower = 0;
     double rightFrontPower = 0;
     double leftRearPower = 0;
-    double rightRearPower = 0;*/
+    double rightRearPower = 0;
+
+   private Rev2mDistanceSensor rightDistanceSensor;
 
     /*
     IMU Sensor Related
@@ -77,6 +82,7 @@ public class HardwarePushBot {
     double GAIN_PROP = 0.015;
     double GAIN_INT = 0.015;
 
+
     public void init(HardwareMap hwMap) {
         mapWheels(hwMap);
         mapWobbleArm(hwMap);
@@ -86,6 +92,26 @@ public class HardwarePushBot {
         mapWobbleArm(hwMap);
         mapShootingWheel(hwMap);
     }
+
+    public void initHardwareMap(HardwarePushBot hardwarePushBot, HardwareMap hardwareMap) {
+        hardwarePushBot.initializeImu(hardwareMap);
+        hardwarePushBot.mapWheels(hardwareMap);
+        hardwarePushBot.mapColorSensor(hardwareMap);
+        hardwarePushBot.mapRingIntake(hardwareMap);
+        hardwarePushBot.mapWobbleArm(hardwareMap);
+        hardwarePushBot.mapShootingWheel(hardwareMap);
+        hardwarePushBot.mapTouchSensor(hardwareMap);
+        hardwarePushBot.mapDistanceSensor(hardwareMap);
+        hardwarePushBot.touchSensorWaFront.setMode(DigitalChannel.Mode.INPUT);
+        hardwarePushBot.leftColorSensor.enableLed(true);
+        hardwarePushBot.rightColorSensor.enableLed(true);
+        hardwarePushBot.setWheelDirection();
+
+        hardwarePushBot.wobbleGoalFinger.setPosition(1);
+        hardwarePushBot.wobbleGoalFinger2.setPosition(1);
+        hardwarePushBot.shootingTrigger.setPosition(0);
+    }
+
 
     public void mapWheels(HardwareMap hwMap) {
         leftBackWheel = hwMap.get(DcMotor.class, "left_rear");
@@ -117,6 +143,14 @@ public class HardwarePushBot {
         touchSensorWaFront.setMode(DigitalChannel.Mode.INPUT);
     }
 
+    public void mapDistanceSensor(HardwareMap hwMap) {
+        rightDistanceSensor = hwMap.get(Rev2mDistanceSensor.class,"distance_sensor_right");
+    }
+
+    public double getDistance() {
+         return this.rightDistanceSensor.getDistance(DistanceUnit.INCH);
+    }
+
     public void mapColorSensor(HardwareMap hwMap) {
         leftColorSensor = hwMap.get(RevColorSensorV3.class, "color_sensor_left");  // Check servo config. in RC
         rightColorSensor = hwMap.get(RevColorSensorV3.class, "color_sensor_right");  // Check servo config. in RC
@@ -125,10 +159,30 @@ public class HardwarePushBot {
     }
 
     public void mecanumDrive(double drive, double strafe, double turn) {
-        double leftFrontPower = Range.clip(drive + turn - strafe, -1.0, 1.0);
-        double rightFrontPower = Range.clip(drive - turn + strafe, -1.0, 1.0);
-        double leftRearPower = Range.clip(drive + turn + strafe, -1.0, 1.0);
-        double rightRearPower = Range.clip(drive - turn - strafe, -1.0, 1.0);
+        leftFrontPower = Range.clip(drive + turn - strafe, -1.0, 1.0);
+        rightFrontPower = Range.clip(drive - turn + strafe, -1.0, 1.0);
+        leftRearPower = Range.clip(drive + turn + strafe, -1.0, 1.0);
+        rightRearPower = Range.clip(drive - turn - strafe, -1.0, 1.0);
+        setWheelPower(leftFrontPower, rightFrontPower, leftRearPower, rightRearPower);
+    }
+
+    public void mecanumDrive_DiagStrafe(double drive, double strafe, double turn, int wheelPosition1, int wheelPosition2) {
+        if (wheelPosition1 == 1 || wheelPosition2 == 1)
+             leftFrontPower = Range.clip(drive + turn - strafe, -1.0, 1.0);
+        else
+            leftFrontPower = 0;
+        if (wheelPosition1 == 2 || wheelPosition2 == 2)
+            rightFrontPower = Range.clip(drive - turn + strafe, -1.0, 1.0);
+        else
+            rightFrontPower = 0;
+        if (wheelPosition1 == 3 || wheelPosition2 == 3)
+            leftRearPower = Range.clip(drive + turn + strafe, -1.0, 1.0);
+        else
+            leftRearPower = 0;
+        if (wheelPosition1 == 4 || wheelPosition2 == 4)
+            rightRearPower = Range.clip(drive - turn - strafe, -1.0, 1.0);
+        else
+            rightRearPower = 0;
         setWheelPower(leftFrontPower, rightFrontPower, leftRearPower, rightRearPower);
     }
 
