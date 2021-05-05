@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="Target A_State Competition_Red Right Target Zones")
+@Autonomous(name="Target A State Competition")
 public class Target_A_State_Competition extends LinearOpMode {
 
     RingIdentification ringIdentification = new RingIdentification();
@@ -106,7 +106,7 @@ public class Target_A_State_Competition extends LinearOpMode {
 
         encoderBot.stopResetEncoder(hardwarePushBot);
         encoderBot.runWithoutEncoder(hardwarePushBot);
-        drivewWithFeedback_FBM_encoderCount(-0.8,0, DRIVE_FORWARD, -1575);
+        drivewWithFeedback_FBM_encoderCount(-0.8,0, DRIVE_FORWARD, -1600);
 
         //Go to the right
         encoderBot.stopResetEncoder(hardwarePushBot);
@@ -127,18 +127,20 @@ public class Target_A_State_Competition extends LinearOpMode {
         //Drive Back
         encoderBot.stopResetEncoder(hardwarePushBot);
         encoderBot.runWithoutEncoder(hardwarePushBot);
-        drivewWithFeedback_FBM_encoderCount(0.8,0, DRIVE_BACK, 200);
+        drivewWithFeedback_FBM_encoderCount(0.8,0, DRIVE_BACK, 225);
 
         encoderBot.stopResetEncoder(hardwarePushBot);
 
         //Turn Left
-        encoderBot.setTargetPosition(hardwarePushBot, TURN_LEFT,1115);
+        encoderBot.setTargetPosition(hardwarePushBot, TURN_LEFT,1105);
         encoderBot.runToPosition(hardwarePushBot,this,0.8, telemetry);
 
         //Drive Forward
         encoderBot.stopResetEncoder(hardwarePushBot);
         encoderBot.setTargetPosition(hardwarePushBot, DRIVE_FORWARD,985);
         encoderBot.runToPosition(hardwarePushBot,this,0.6, telemetry);
+
+    sleep(200);
 
         //Close Claw
         hardwarePushBot.wobbleGoalFinger.setPosition(1);
@@ -157,13 +159,20 @@ public class Target_A_State_Competition extends LinearOpMode {
         encoderBot.stopResetEncoder(hardwarePushBot);
 
         //Turn Right
-        encoderBot.setTargetPosition(hardwarePushBot, TURN_RIGHT,1200);
+        encoderBot.setTargetPosition(hardwarePushBot, TURN_RIGHT,1115);
         encoderBot.runToPosition(hardwarePushBot,this,0.8, telemetry);
 
-        //Drive Forward\
+        //Strafe Right with distance sensor
+        encoderBot.stopResetEncoder(hardwarePushBot);
+        encoderBot.runWithoutEncoder(hardwarePushBot);
+        drivewWithFeedback_FBM_distanceSensor(0, 0.75, 1, 12);
+
+
+        //Drive Forward
         encoderBot.stopResetEncoder(hardwarePushBot);
         encoderBot.setTargetPosition(hardwarePushBot, DRIVE_FORWARD,300);
         encoderBot.runToPosition(hardwarePushBot,this,0.6, telemetry);
+
 
         //Wobble Goal Arm Up slightly
         encoderBot.setTargetPosition(hardwarePushBot, WOBBLE_ARM_DOWN, 2000);  //Move wobble arm down to place thw wobble goal.
@@ -171,49 +180,38 @@ public class Target_A_State_Competition extends LinearOpMode {
 
         hardwarePushBot.wobbleGoalFinger.setPosition(0);
         hardwarePushBot.wobbleGoalFinger2.setPosition(0);
-        sleep(10000);
+        sleep(100);
 
         //Drive Back
-        encoderBot.setTargetPosition_FBM(hardwarePushBot, DRIVE_BACK,250);
-        encoderBot.runToPosition_FBM(hardwarePushBot,DRIVE_BACK,this,0.8);
+        encoderBot.stopResetEncoder(hardwarePushBot);
+        encoderBot.runWithoutEncoder(hardwarePushBot);
+        drivewWithFeedback_FBM_encoderCount(0.8,0, DRIVE_BACK, 200);
 
-        //Wobble Goal Arm Up slightly
+        //Wobble Goal Arm Up
         encoderBot.setTargetPosition(hardwarePushBot, WOBBLE_ARM_UP, 3100);  //Move the wobble arm up.
         encoderBot.runToPositionForWobbleArmBack(hardwarePushBot, 0.75, this);
 
         SHOOTING_WHEEL_VELOCITY = -1700;
-        encoderBot.startShootingWheelUsingEncoder(hardwarePushBot,SHOOTING_WHEEL_VELOCITY);
+      //  encoderBot.startShootingWheelUsingEncoder(hardwarePushBot,SHOOTING_WHEEL_VELOCITY);
 
-        //Strafe Left
+        //Strafe Left using distance sensor
+       //encoderBot.stopResetEncoder(hardwarePushBot);
+       /* encoderBot.runWithoutEncoder(hardwarePushBot);
+        drivewWithFeedback_FBM_distanceSensor(0, -0.75, 3, 36);*/
 
-        encoderBot.setTargetPosition_FBM(hardwarePushBot, STRAFE_LEFT,610);
-        encoderBot.runToPosition_FBM(hardwarePushBot,STRAFE_LEFT,this,0.8);
+        encoderBot.stopResetEncoder(hardwarePushBot);
+        encoderBot.runWithoutEncoder(hardwarePushBot);
+        drivewWithFeedback_FBM_encoderCount(0,-0.4, STRAFE_LEFT, -350);
 
-        //drivewWithFeedback_FBM(0.6, 0, 0.25);
+        encoderBot.runWithoutEncoder(hardwarePushBot);
+        drivewWithFeedback_FBM_distanceSensor(0, -0.4, 1.0, 36); //Strafe right to get ready for shooting
+       /* encoderBot.setTargetPosition(hardwarePushBot, STRAFE_LEFT, 575);  // Strafe left.
+        encoderBot.runToPosition_withdistanceSensor(hardwarePushBot, this, 0.8, 38, telemetry);
+*/
 
-        hardwarePushBot.shootingTrigger.setPosition(1);
-        sleep(550);
-        hardwarePushBot.shootingTrigger.setPosition(0);
-        sleep(500);
-
-        encoderBot.setTargetPosition(hardwarePushBot, TURN_LEFT,75);
-        encoderBot.runToPosition(hardwarePushBot,this,0.6, telemetry);
-
-        encoderBot.setTargetPosition(hardwarePushBot, DRIVE_FORWARD,100);
-        encoderBot.runToPosition(hardwarePushBot,this,0.6, telemetry);
-
-        hardwarePushBot.shootingTrigger.setPosition(1);
-        sleep(550);
-        hardwarePushBot.shootingTrigger.setPosition(0);
-        sleep(500);
-
-        encoderBot.setTargetPosition(hardwarePushBot, DRIVE_BACK,100);
-        encoderBot.runToPosition(hardwarePushBot,this,0.6, telemetry);
-
-        encoderBot.setTargetPosition(hardwarePushBot, TURN_LEFT,45);
-        encoderBot.runToPosition(hardwarePushBot,this,0.6, telemetry);
-
-        encoderBot.setTargetPosition(hardwarePushBot, DRIVE_FORWARD,100);
+        //Drive Forward
+       /* encoderBot.stopResetEncoder(hardwarePushBot);
+        encoderBot.setTargetPosition(hardwarePushBot, DRIVE_FORWARD,300);
         encoderBot.runToPosition(hardwarePushBot,this,0.6, telemetry);
 
         hardwarePushBot.shootingTrigger.setPosition(1);
@@ -221,8 +219,30 @@ public class Target_A_State_Competition extends LinearOpMode {
         hardwarePushBot.shootingTrigger.setPosition(0);
         sleep(500);
 
-        encoderBot.setTargetPosition_FBM(hardwarePushBot, DRIVE_FORWARD,100);
-        encoderBot.runToPosition_FBM(hardwarePushBot,DRIVE_FORWARD,this,0.6);
+        //Strafe Left using distance sensor
+        encoderBot.stopResetEncoder(hardwarePushBot);
+        encoderBot.runWithoutEncoder(hardwarePushBot);
+        drivewWithFeedback_FBM_distanceSensor(0, 0.75, 3, 42);
+
+        hardwarePushBot.shootingTrigger.setPosition(1);
+        sleep(550);
+        hardwarePushBot.shootingTrigger.setPosition(0);
+        sleep(500);
+
+        //Strafe Left using distance sensor
+        encoderBot.stopResetEncoder(hardwarePushBot);
+        encoderBot.runWithoutEncoder(hardwarePushBot);
+        drivewWithFeedback_FBM_distanceSensor(0, 0.75, 3, 46);
+
+        hardwarePushBot.shootingTrigger.setPosition(1);
+        sleep(550);
+        hardwarePushBot.shootingTrigger.setPosition(0);
+        sleep(500);
+
+        //Drive Forward to park on the white line
+        encoderBot.stopResetEncoder(hardwarePushBot);
+        encoderBot.runWithoutEncoder(hardwarePushBot);
+        drivewWithFeedback_FBM_encoderCount(-0.8,0, DRIVE_FORWARD, -200);*/
     }
 
     private void goToTargetB() {
