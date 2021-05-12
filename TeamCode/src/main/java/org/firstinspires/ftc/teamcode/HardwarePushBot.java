@@ -66,7 +66,9 @@ public class HardwarePushBot {
     double leftRearPower = 0;
     double rightRearPower = 0;
 
-   private Rev2mDistanceSensor rightDistanceSensor;
+    private Rev2mDistanceSensor rightDistanceSensor;
+    private Rev2mDistanceSensor frontDistanceSensor;
+    private Rev2mDistanceSensor backDistanceSensor;
 
     /*
     IMU Sensor Related
@@ -145,10 +147,20 @@ public class HardwarePushBot {
 
     public void mapDistanceSensor(HardwareMap hwMap) {
         rightDistanceSensor = hwMap.get(Rev2mDistanceSensor.class,"distance_sensor_right");
+        frontDistanceSensor = hwMap.get(Rev2mDistanceSensor.class,"distance_sensor_front");
+        backDistanceSensor = hwMap.get(Rev2mDistanceSensor.class,"distance_sensor_back");
     }
 
     public double getDistance() {
          return this.rightDistanceSensor.getDistance(DistanceUnit.INCH);
+    }
+
+    public double getFrontDistance() {
+        return this.frontDistanceSensor.getDistance(DistanceUnit.INCH);
+    }
+
+    public double getBackDistance() {
+        return this.backDistanceSensor.getDistance(DistanceUnit.INCH);
     }
 
     public void mapColorSensor(HardwareMap hwMap) {
