@@ -216,7 +216,7 @@ public class Teleop_Basic_Iterative_v1 extends OpMode
         hardwarePushBot.wobbleGoalArm.setPower(wobbleGoalupdown); // Wobble Goal Arm Position Control
 
        if(gamepad1.right_bumper){
-            masterPowerScaleDrive = 1.0; //Range.clip(masterPowerScaleDrive + 0.2, 0.2, 1.0);
+            masterPowerScaleDrive = 0.8; //Range.clip(masterPowerScaleDrive + 0.2, 0.2, 1.0);
         }
 
        if(gamepad1.left_bumper){
