@@ -76,6 +76,12 @@ public class Teleop_Basic_Iterative_v1 extends OpMode
     static double SHOOTING_WHEEL_VELOCITY = -1760;
     static double SHOOTING_WHEEL_VELOCITY_POWERSHOT = -1700;
     DistanceSensor rightSensorRange;
+    double heading;
+    double integralError = 0;
+    double error = 0;
+    double deltaTurn = 0;
+    double GAIN_PROP = 0.015;
+    double GAIN_INT = 0.015;
 
 
     // Declare OpMode members.
@@ -184,7 +190,7 @@ public class Teleop_Basic_Iterative_v1 extends OpMode
         // POV Mode uses left stick to go forward, and right stick to turn.
         // - This uses basic math to combine motions and is easier to drive straight.
         double drive = gamepad1.left_stick_y;
-        double strafe  =  gamepad1.left_stick_x;
+        double strafe  =  gamepad1.left_stick_x + gamepad1.right_trigger - gamepad1.left_trigger;
         double turn  =  -gamepad1.right_stick_x;
 
         if(gamepad1.dpad_up){
@@ -353,6 +359,7 @@ public class Teleop_Basic_Iterative_v1 extends OpMode
         hardwarePushBot.mapWobbleArm(hardwareMap);
         hardwarePushBot.mapShootingWheel(hardwareMap);
         hardwarePushBot.mapTouchSensor(hardwareMap);
+        hardwarePushBot.initializeImu(hardwareMap);
 
         hardwarePushBot.touchSensorWaFront.setMode(DigitalChannel.Mode.INPUT);
 
@@ -392,5 +399,9 @@ public class Teleop_Basic_Iterative_v1 extends OpMode
         hardwarePushBot.shootingWheel.setVelocity(shootingVelocity);
 
     }
+
+    
+
+
 }
 
