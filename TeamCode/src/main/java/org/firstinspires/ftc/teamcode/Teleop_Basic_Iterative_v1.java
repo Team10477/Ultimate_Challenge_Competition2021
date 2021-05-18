@@ -193,11 +193,11 @@ public class Teleop_Basic_Iterative_v1 extends OpMode
         double strafe  =  gamepad1.left_stick_x + gamepad1.right_trigger - gamepad1.left_trigger;
         double turn  =  -gamepad1.right_stick_x;
 
-        if(gamepad1.dpad_up){
+        if(gamepad1.dpad_up || gamepad2.left_trigger > 0){
             hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             wobbleGoalupdown = 0.7;
         }
-        else if(gamepad1.dpad_down){
+        else if(gamepad1.dpad_down || gamepad2.right_trigger > 0){
             hardwarePushBot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             wobbleGoalupdown = -0.7;
         }
